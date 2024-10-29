@@ -1,0 +1,125 @@
+@charset "UTF-8";
+
+body, html {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+}
+
+/* 상단 고정 헤더 */
+.header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background-color: #2D3539;
+	color: white;
+	padding: 15px;
+	display: flex;
+	justify-content: space-between;
+	z-index: 1000;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added shadow */
+}
+
+/* 좌측 고정 사이드바 */
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 250px; /* Consider using max-width for responsiveness */
+	height: 100%;
+	background-color: #414B5A;
+	padding-top: 70px;
+	z-index: 999;
+	color: white;
+	overflow-y: auto;
+	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Added shadow */
+}
+
+.sidebar h3 {
+	padding: 15px;
+	text-align: center;
+	background-color: #414B5A;
+}
+
+/* 링크와 아코디언 버튼 모두 같은 스타일 적용 */
+.sidebar a, .accordion-button {
+	color: white;
+	padding: 10px 20px;
+	text-decoration: none;
+	display: block;
+	background-color: #414B5A;
+	border: 1px solid #354b5e; /* 테두리 통일 */
+	border-radius: 0; /* 직각 처리 */
+	transition: background-color 0.3s; /* Smooth hover transition */
+}
+
+.sidebar a:hover, .accordion-button:hover {
+	background-color: #354b5e;
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+	margin-left: 250px;
+	padding: 85px 20px;
+	background-color: #e9ecef;
+	min-height: 100vh;
+	display: flex;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+
+.content-box {
+	background-color: white;
+	width: 1500px;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+/* Adjusted sub-title spacing */
+#sub-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px; /* Add spacing below */
+}
+
+/* 아코디언 펼쳤을 때도 동일한 테두리 유지 */
+.accordion-button:not(.collapsed) {
+	background-color: #414B5A;
+	border-radius: 0; /* 직각 처리 */
+}
+
+/* 아코디언 하위 메뉴 색상 및 테두리 */
+.accordion-body {
+	background-color: #414B5A;
+}
+
+.accordion-body a {
+	padding-left: 20px;
+	background-color: transparent;
+	color: white;
+	border-left: 1px solid #354b5e; /* 하위 항목도 테두리 적용 */
+	border-right: 1px solid #354b5e;
+	border-radius: 0; /* 직각 처리 */
+	transition: background-color 0.3s; /* Smooth hover transition */
+}
+
+.accordion-body a:hover {
+	background-color: #354b5e;
+}
+
+/* 회원 관리 메뉴에 테두리 추가 */
+.sidebar a:last-of-type {
+	border: 1px solid #354b5e; /* 테두리 통일 */
+	border-radius: 0; /* 직각 처리 */
+}
+
+@media ( max-width : 768px) {
+	.content-box {
+		width: 95%; /* 작은 화면에서 너비 조정 */
+		margin: 10px auto; /* 마진 줄이기 */
+	}
+}
