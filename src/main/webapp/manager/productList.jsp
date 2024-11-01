@@ -1,5 +1,12 @@
+<%@page import="java.sql.SQLException"%>
+<%@page import="manager.util.SearchVO"%>
+<%@page import="manager.util.BoardUtil"%>
+<%@page import="java.util.List"%>
+<%@page import="manager.productlist.ProductVO"%>
+<%@page import="manager.productlist.AdminProductManagementDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" info="상품 리스트"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -200,6 +207,15 @@
 /* 테이블 스타일 */
 table {
 	font-size: 13px;
+	text-align: center;
+}
+
+/* 페이지네이션 */
+#pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 }
 </style>
 
@@ -255,20 +271,136 @@ table {
 	}
 </script>
 
+<!-- 검색어 입력 -->
+<script type="text/javascript">
+$(function(){
+
+	$("#product-name").keyup(function( evt ){
+		if(evt.which == 13 ){
+			chkNull();
+		}//end if
+		
+		$("#brand-name").keyup(function( evt ){
+			if(evt.which == 13 ){
+				chkNull();
+			}//end if	
+		
+		$("#search-btn").click(function(){
+			chkNull();
+		});//click
+		
+		
+		//검색으로 선택한 컬럼명과 키워드를 설정(JSP코드로 작성가능)
+		if(${ not empty param.keyword }){
+			$("#field").val(${ param.field });
+			$("#product-name").val("${ param.keyword }");
+		}//end if
+		
+		//검색으로 선택한 컬럼명과 키워드를 설정(JSP코드로 작성가능)
+		if(${ not empty param.keyword }){
+			$("#field").val(${ param.field });
+			$("#brand-name").val("${ param.keyword }");
+		}//end if
+
+})// ready
+
+
+function chkNull(){
+		var keyword=$("#product-name").val();
+		var keyword2=$("#brand-name").val();
+		
+		if(keyword.length < 2 || keyword2.length < 2 ){
+			alert("검색 키워드는 한글자 이상이 입력하셔야합니다.");
+			return;
+		}//end if
+		
+		$("#searchFrm").submit();
+	}//chkNull
+
+</script>
+
 </head>
 <body>
 
+	<!-- 사이드바 포함 -->
 	<jsp:include page="sidebar.jsp"></jsp:include>
+
+	<jsp:useBean id="sVO" class="manager.util.SearchVO" scope="page" />
+	<jsp:setProperty property="*" name="sVO" />
+
+	<%
+	AdminProductManagementDAO apmDAO = AdminProductManagementDAO.getInstance();
+
+	// 총 레코드 수 구하기
+	int totalCount = 0;
+
+	try {
+		totalCount = apmDAO.selectTotalCount(sVO);
+	} catch (SQLException se) {
+		se.printStackTrace();
+	}
+
+	// 페이지 당 레코드 수 및 페이지 수 계산
+	final int pageScale = 10;
+
+	int totalPage = (int) Math.ceil((double) totalCount / pageScale);
+
+	// 현재 페이지와 시작, 끝 번호 계산
+	String paramPage = request.getParameter("currentPage");
+	int currentPage = 1;
+	try {
+		if (paramPage != null) {
+			currentPage = Integer.parseInt(paramPage);
+		}
+	} catch (NumberFormatException e) {
+		currentPage = 1; // 기본값 설정
+	}
+	int startNum = currentPage * pageScale - pageScale + 1;
+	int endNum = startNum + pageScale - 1; //끝 번호
+
+	// SearchVO에 값 설정
+	sVO.setCurrentPage(currentPage);
+	sVO.setStartNum(startNum);
+	sVO.setEndNum(endNum);
+	sVO.setTotalPage(totalPage);
+	sVO.setTotalCount(totalCount);
+	sVO.setUrl("productList.jsp"); // 페이지 URL 설정
+
+	List<ProductVO> listBoard = null;
+	try {
+		listBoard = apmDAO.selectBoard(sVO); // 시작번호와 끝 번호를 사용해 데이터 조회
+
+		// 상품명이 20자를 초과할 경우 잘라내기
+		String tempName = "";
+		for (ProductVO tempVO : listBoard) {
+			tempName = tempVO.getProductName();
+			if (tempName != null && tempName.length() > 20) {
+		tempVO.setProductName(tempName.substring(0, 19) + "...");
+			}
+		}
+
+	} catch (SQLException se) {
+		se.printStackTrace();
+	}
+
+	// 페이지 정보를 JSP에 전달
+	pageContext.setAttribute("totalCount", totalCount);
+	pageContext.setAttribute("pageScale", pageScale);
+	pageContext.setAttribute("totalPage", totalPage);
+	pageContext.setAttribute("currentPage", currentPage);
+	request.setAttribute("productList", listBoard);
+	%>
 
 	<!-- 메인 콘텐츠 영역 -->
 	<div class="main-content">
+
 		<div class="content-box" id="sub-title">
 			<h4>상품 리스트</h4>
 		</div>
 		<div class="content-box" id="status-container">
 			<div class="status-item">
 				<div class="icon all"></div>
-				<span>전체</span> <span>1 건</span>
+				<span>전체</span> <span><%=sVO.getTotalCount()%> 건</span>
 			</div>
 			<div class="status-item">
 				<div class="icon on-sale"></div>
@@ -285,13 +417,19 @@ table {
 		</div>
 
 		<div class="content-box" id="search-container">
+
 			<!-- Search Keyword -->
 			<div class="search-item">
-				<label for="keyword">검색어</label> <label for="product-name">상품명</label>
-				<input type="text" id="product-name" placeholder="상품명 입력"> <label
-					for="brand-name">브랜드명</label> <input type="text" id="brand-name"
-					placeholder="브랜드명 입력">
+				<form action="product_list.jsp" method="get" name="searchFrm"
+					id="searchFrm">
+					<label for="keyword">검색어</label> <label for="product-name">상품명</label>
+					<input type="text" id="product-name" class="keyword"
+						placeholder="상품명 입력"> <label for="brand-name">브랜드명</label>
+					<input type="text" id="brand-name" placeholder="브랜드명 입력"
+						class="keyword">
+				</form>
 			</div>
+
 
 			<!-- Sales Status -->
 			<div class="search-item">
@@ -340,7 +478,8 @@ table {
 			<div class="product-list-actions">
 				<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
 				<div class="product-count">
-					<span>상품 목록(총 0개)</span> <select id="REG_DATE">
+					<span>상품 목록(총 <%=sVO.getTotalCount()%>개)
+					</span> <select id="REG_DATE">
 						<option value="판매시작일순">상품명순</option>
 						<option value="판매가 낮은순">판매가 낮은순</option>
 						<option value="판매가 높은순">판매가 높은순</option>
@@ -367,9 +506,11 @@ table {
 
 			<hr>
 
+
+
 			<!-- 상품 테이블 -->
 			<table class="table">
-				<thead class="table-light" style="text-align: center;">
+				<thead class="table-light">
 					<tr>
 						<td><input type="checkbox" id="select-all"></td>
 						<td>수정</td>
@@ -386,25 +527,47 @@ table {
 						<td>판매종료일</td>
 					</tr>
 				</thead>
+
 				<tbody>
-					<tr>
-						<td><input type="checkbox" class="chk"></td>
-						<td><input type="button" value="수정" class="edit"></td>
-						<td>10001</td>
-						<td>뉴발란스 993</td>
-						<td>MLGREY993</td>
-						<td>뉴발란스</td>
-						<td><input type="button" id="explanation" value="상세설명"></td>
-						<td>판매상태</td>
-						<td>재고수량</td>
-						<td>판매가</td>
-						<td>할인가</td>
-						<td>판매시작일</td>
-						<td>판매종료일</td>
-					</tr>
+					<c:if test="${ empty listBoard }">
+						<tr>
+							<td style="text-align: center" colspan="13">조회 가능한 항목이 없습니다.<br>
+							</td>
+						</tr>
+					</c:if>
+
+					<c:if test="${ not empty param.keyword }">
+						<c:set var="searchParam"
+							value="&field=${ param.field }&keyword=${ param.keyword }" />
+					</c:if>
+
+
+
+					<c:forEach var="item" items="${productList}">
+						<tr>
+							<td><input type="checkbox" class="chk"></td>
+							<td><input type="button" value="수정" class="edit"></td>
+							<td>${item.productId}</td>
+							<td>${item.productName}</td>
+							<td>${item.modelName}</td>
+							<td>${item.brand}</td>
+							<td><input type="button" value="상세설명"></td>
+							<td>${item.saleStatus}</td>
+							<td>${item.stockQuantity}</td>
+							<td>${item.price}</td>
+							<td>${item.discount_price}</td>
+							<td>${item.createAt}</td>
+							<td>${item.finishAt}</td>
+						</tr>
+					</c:forEach>
 				</tbody>
 			</table>
 
+			<!-- 페이지네이션 -->
+			<div id="pagination">
+				<%=new BoardUtil().pagination(sVO)%>
+			</div>
+			<br>
 			<!-- 저장 버튼 -->
 			<div class="search-item button-group">
 				<button id="submit" class="btn-save">수정 항목 저장</button>
@@ -412,6 +575,7 @@ table {
 		</div>
 
 		<!-- end main -->
+
 	</div>
 
 

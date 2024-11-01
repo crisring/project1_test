@@ -1,5 +1,13 @@
+<%@page import="manager.util.SearchVO"%>
+<%@page import="manager.util.BoardUtil"%>
+<%@page import="java.sql.SQLException"%>
+<%@page import="manager.saleslist.AdminSalesManagementDAO"%>
+<%@page import="manager.productlist.OrderVO"%>
+<%@page import="java.util.List"%>
+<%@page import="manager.productlist.AdminProductManagementDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" info="상품 리스트"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -193,12 +201,14 @@
 }
 
 #cancel-button {
+	margin-left: 255px;
 	background-color: #f14668;
 }
 
 /* 테이블의 폰트 크기도 조정 가능 */
 table {
 	font-size: 14px;
+	text-align: center;
 }
 
 .btn-save {
@@ -208,6 +218,14 @@ table {
 	color: white;
 	border: none;
 	border-radius: 5px;
+}
+
+/* 페이지네이션 */
+#pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 }
 </style>
 <!-- 상태 아이콘 클릭 스크립트 -->
@@ -236,6 +254,73 @@ table {
 	<!-- 사이드바 포함 -->
 	<jsp:include page="sidebar.jsp"></jsp:include>
 
+	<jsp:useBean id="sVO" class="manager.util.SearchVO" scope="page" />
+	<jsp:setProperty property="*" name="sVO" />
+
+	<%
+	AdminSalesManagementDAO asmDAO = AdminSalesManagementDAO.getInstance();
+
+	// 총 레코드 수 구하기
+	int totalCount = 0;
+
+	try {
+		totalCount = asmDAO.selectTotalCount(sVO);
+	} catch (SQLException se) {
+		se.printStackTrace();
+	}
+
+	// 페이지 당 레코드 수 및 페이지 수 계산
+	final int pageScale = 10;
+
+	int totalPage = (int) Math.ceil((double) totalCount / pageScale);
+
+	// 현재 페이지와 시작, 끝 번호 계산
+	String paramPage = request.getParameter("currentPage");
+	int currentPage = 1;
+	try {
+		if (paramPage != null) {
+			currentPage = Integer.parseInt(paramPage);
+		}
+	} catch (NumberFormatException e) {
+		currentPage = 1; // 기본값 설정
+	}
+	int startNum = currentPage * pageScale - pageScale + 1;
+	int endNum = startNum + pageScale - 1; //끝 번호
+
+	// SearchVO에 값 설정
+	sVO.setCurrentPage(currentPage);
+	sVO.setStartNum(startNum);
+	sVO.setEndNum(endNum);
+	sVO.setTotalPage(totalPage);
+	sVO.setTotalCount(totalCount);
+	sVO.setUrl("salesList.jsp"); // 페이지 URL 설정
+
+	List<OrderVO> listBoard = null;
+	try {
+		listBoard = asmDAO.selectBoard(sVO); // 시작번호와 끝 번호를 사용해 데이터 조회
+
+		// 상품명이 20자를 초과할 경우 잘라내기
+		String tempName = "";
+		for (OrderVO tempVO : listBoard) {
+			tempName = tempVO.getOrderName();
+			if (tempName != null && tempName.length() > 20) {
+		tempVO.setOrderName(tempName.substring(0, 19) + "...");
+			}
+		}
+
+	} catch (SQLException se) {
+		se.printStackTrace();
+	}
+
+	// 페이지 정보를 JSP에 전달
+	pageContext.setAttribute("totalCount", totalCount);
+	pageContext.setAttribute("pageScale", pageScale);
+	pageContext.setAttribute("totalPage", totalPage);
+	pageContext.setAttribute("currentPage", currentPage);
+	pageContext.setAttribute("saleslist", listBoard);
+	%>
+
+
 	<!-- 메인 콘텐츠 -->
 	<div class="main-content">
 		<!-- 판매 리스트 제목 -->
@@ -247,7 +332,7 @@ table {
 		<div class="content-box" id="status-container">
 			<div class="status-item">
 				<div class="icon all"></div>
-				<span>전체</span> <span>1 건</span>
+				<span>전체</span> <span><%=sVO.getTotalCount()%> 건</span>
 			</div>
 			<div class="status-item">
 				<div class="icon on-sale"></div>
@@ -297,12 +382,16 @@ table {
 			</div>
 		</div>
 
+
+
+
 		<!-- 상품 목록 -->
 		<div class="content-box" id="content-box4">
 			<div class="product-list-actions">
 				<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
 				<div class="product-count">
-					<span>상품 목록(총 0개)</span>
+					<span>상품 목록(총 <%=sVO.getTotalCount()%>개)
+					</span>
 					<button type="submit" class="select-delete-btn">선택삭제</button>
 				</div>
 
@@ -324,6 +413,8 @@ table {
 
 			<hr>
 
+
+
 			<!-- 상품 테이블 -->
 			<table class="table">
 				<thead class="table-light">
@@ -336,23 +427,35 @@ table {
 						<td>구매자ID</td>
 					</tr>
 				</thead>
+
 				<tbody>
-					<tr>
-						<td><input type="checkbox" class="chk"></td>
-						<td>10001</td>
-						<td>뉴발란스 993</td>
-						<td>주문상태</td>
-						<td>배송상태</td>
-						<td>구매자ID</td>
-					</tr>
+					<c:forEach var="item" items="${saleslist}">
+						<tr>
+							<td><input type="checkbox" class="chk"></td>
+							<td>${item.orderId}</td>
+							<td>${item.orderName}</td>
+							<td>${item.orderStatus}</td>
+							<td>${item.shippingStatus}</td>
+							<td>${item.userId}</td>
+						</tr>
+					</c:forEach>
 				</tbody>
 			</table>
+
+			<!-- 페이지네이션 -->
+			<div id="pagination">
+				<%=new BoardUtil().pagination(sVO)%>
+			</div>
+			<br>
 
 			<!-- 저장 버튼 -->
 			<div class="search-item button-group">
 				<button id="submit" class="btn-save">수정 항목 저장</button>
 			</div>
+
+
 		</div>
+
 	</div>
 
 </body>

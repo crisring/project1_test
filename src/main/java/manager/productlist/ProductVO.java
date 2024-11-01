@@ -5,11 +5,14 @@ import java.util.Date;
 
 public class ProductVO {
 
-	private int productId, catalog, size, price, salePrice; // 상품번호, 카탈로그번호, 선택 사이즈, 가격, 할인가격
+	private int productId, catalog, size, price, salePrice, stockQuantity, discount_price;
+	// 상품번호, 카탈로그번호, 선택 사이즈, 가격, 할인가격, 수량, 할인가
 	private int[] subimgId;
-	private String imgName, stockQuantity, description, productName, modelName; // 메인이미지, 수량, 상세설명, 상품명, 모델명
-	private String[] sizes, brand;
-	private Date createAt;
+	private String imgName, description, productName, modelName, brand, saleStatus;
+	// 메인이미지, 상세설명, 상품명, 모델명, 브랜드명, 판매상태
+
+	private String[] sizes;
+	private Date createAt, finishAt;
 
 	public int getProductId() {
 		return productId;
@@ -67,11 +70,11 @@ public class ProductVO {
 		this.imgName = imgName;
 	}
 
-	public String getStockQuantity() {
+	public int getStockQuantity() {
 		return stockQuantity;
 	}
 
-	public void setStockQuantity(String stockQuantity) {
+	public void setStockQuantity(int stockQuantity) {
 		this.stockQuantity = stockQuantity;
 	}
 
@@ -107,14 +110,6 @@ public class ProductVO {
 		this.sizes = sizes;
 	}
 
-	public String[] getBrand() {
-		return brand;
-	}
-
-	public void setBrand(String[] brand) {
-		this.brand = brand;
-	}
-
 	public Date getCreateAt() {
 		return createAt;
 	}
@@ -123,13 +118,46 @@ public class ProductVO {
 		this.createAt = createAt;
 	}
 
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
+	public String getSaleStatus() {
+		return saleStatus;
+	}
+
+	public void setSaleStatus(String saleStatus) {
+		this.saleStatus = saleStatus;
+	}
+
+	public int getDiscount_price() {
+		return discount_price;
+	}
+
+	public void setDiscount_price(int discount_price) {
+		this.discount_price = discount_price;
+	}
+
+	public Date getFinishAt() {
+		return finishAt;
+	}
+
+	public void setFinishAt(Date finishAt) {
+		this.finishAt = finishAt;
+	}
+
 	@Override
 	public String toString() {
 		return "ProductVO [productId=" + productId + ", catalog=" + catalog + ", size=" + size + ", price=" + price
-				+ ", salePrice=" + salePrice + ", subimgId=" + Arrays.toString(subimgId) + ", imgName=" + imgName
-				+ ", stockQuantity=" + stockQuantity + ", description=" + description + ", productName=" + productName
-				+ ", modelName=" + modelName + ", sizes=" + Arrays.toString(sizes) + ", brand=" + Arrays.toString(brand)
-				+ ", createAt=" + createAt + "]";
+				+ ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity + ", discount_price=" + discount_price
+				+ ", subimgId=" + Arrays.toString(subimgId) + ", imgName=" + imgName + ", description=" + description
+				+ ", productName=" + productName + ", modelName=" + modelName + ", brand=" + brand + ", saleStatus="
+				+ saleStatus + ", sizes=" + Arrays.toString(sizes) + ", createAt=" + createAt + ", finishAt=" + finishAt
+				+ "]";
 	}
 
 }
