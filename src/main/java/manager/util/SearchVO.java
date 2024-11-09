@@ -5,7 +5,9 @@ package manager.util;
  */
 public class SearchVO {
 	private int startNum, endNum, currentPage, totalPage, totalCount; // 시작번호, 끝번호, 현재 페이지 번호, 총 페이지 수
-	private String field = "0", keyword, url;// 검색할 field에 대응되는 숫자, 검색 값, url
+	private String brand, productName, saleStatus, startDate, endDate, dateType, sortBy;
+	// 검색할 브랜드, 상품명, 판매상태, 기간, 조회기간, 정렬기준
+	private String url, OrderStatus; // url, 주문상태
 
 	public int getStartNum() {
 		return startNum;
@@ -31,30 +33,6 @@ public class SearchVO {
 		this.currentPage = currentPage;
 	}
 
-	public String getField() {
-		return field;
-	}
-
-	public void setField(String field) {
-		this.field = field;
-	}
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
 	public int getTotalPage() {
 		return totalPage;
 	}
@@ -71,11 +49,84 @@ public class SearchVO {
 		this.totalCount = totalCount;
 	}
 
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public String getSaleStatus() {
+		return saleStatus;
+	}
+
+	public void setSaleStatus(String saleStatus) {
+		this.saleStatus = saleStatus;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getDateType() {
+		return dateType;
+	}
+
+	public void setDateType(String dateType) {
+		this.dateType = dateType;
+	}
+
+	public String getSortBy() {
+		return sortBy;
+	}
+
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
+	}
+
+	public String getOrderStatus() {
+		return OrderStatus;
+	}
+
+	public void setOrderStatus(String orderStatus) {
+		OrderStatus = orderStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "SearchVO [startNum=" + startNum + ", endNum=" + endNum + ", currentPage=" + currentPage + ", totalPage="
-				+ totalPage + ", totalCount=" + totalCount + ", field=" + field + ", keyword=" + keyword + ", url="
-				+ url + "]";
+				+ totalPage + ", totalCount=" + totalCount + ", brand=" + brand + ", productName=" + productName
+				+ ", saleStatus=" + saleStatus + ", startDate=" + startDate + ", endDate=" + endDate + ", dateType="
+				+ dateType + ", sortBy=" + sortBy + ", url=" + url + ", OrderStatus=" + OrderStatus + "]";
 	}
 
 }

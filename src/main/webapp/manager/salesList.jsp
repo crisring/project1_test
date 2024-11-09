@@ -28,11 +28,11 @@
 
 <!-- 내가 쓴 스타일과 스크립트 -->
 <link rel="shortcut icon"
-	href="http://192.168.10.219/jsp_prj/common/images/favicon.ico" />
+	href="http://localhost/jsp_prj/common/images/favicon.ico" />
 <link rel="stylesheet" type="text/css"
-	href="http://192.168.10.219/jsp_prj/common/css/main_20240911.css">
+	href="http://localhost/jsp_prj/common/css/main_20240911.css">
 <link rel="stylesheet" type="text/css"
-	href="http://192.168.10.219/project1/common/css/main_Sidbar.css">
+	href="http://localhost/project1/common/css/main_Sidbar.css">
 
 <!-- jQuery CDN -->
 <script
@@ -82,7 +82,7 @@
 	content: "\f07a";
 }
 
-.icon.no-sale::before {
+.icon.sale-ended::before {
 	content: "\f07a";
 }
 </style>
@@ -176,6 +176,8 @@
 
 .product-count {
 	font-size: 14px;
+	display: flex;
+	gap: 10px;
 }
 
 .select-delete-btn {
@@ -200,11 +202,6 @@
 	border: none;
 }
 
-#cancel-button {
-	margin-left: 255px;
-	background-color: #f14668;
-}
-
 /* 테이블의 폰트 크기도 조정 가능 */
 table {
 	font-size: 14px;
@@ -227,20 +224,70 @@ table {
 	align-items: center;
 	text-align: center;
 }
+
+#order-status {
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background-color: white;
+	cursor: pointer;
+	border-radius: 8px;
+	background-color: white;
+	background-color: white;
+}
 </style>
-<!-- 상태 아이콘 클릭 스크립트 -->
+
 <script type="text/javascript">
 	$(function() {
-		// 상태 아이콘 클릭 (토글 기능 추가)
-		$(".status-item").click(function() {
-			var currentColor = $(this).css("background-color");
-			if (currentColor === "rgb(72, 199, 116)") { // 초록색
-				$(this).css("background-color", "#f0f0f0"); // 원래 색으로 돌아감
-			} else {
-				$(this).css("background-color", "#48c774"); // 초록색으로 변경
-			}
-		});
 
+		$("#date-range").change(function() {
+			let currentDate = new Date();
+
+			// 종료 날짜 설정
+			var endDate = new Date();
+
+			switch ($(this).val()) {
+			case 'today':
+				endDate = currentDate; // 오늘 날짜
+				break;
+			case '1-week':
+				endDate.setDate(currentDate.getDate() + 7);
+				break;
+			case '1-month':
+				endDate.setMonth(currentDate.getMonth() + 1);
+				break;
+			case '3-months':
+				endDate.setMonth(currentDate.getMonth() + 3);
+				break;
+			case '6-months':
+				endDate.setMonth(currentDate.getMonth() + 6);
+				break;
+			case '1-year':
+				endDate.setFullYear(currentDate.getFullYear() + 1);
+				break;
+			default:
+				endDate = currentDate; // 기본은 오늘 날짜
+				break;
+			}
+
+			// 날짜 값을 설정 (YYYY-MM-DD 형식)
+			$("#start-date").val(formatDate(currentDate));
+			$("#end-date").val(formatDate(endDate));
+		}); // change
+	})// ready
+
+	//날짜 포맷팅 함수 (YYYY-MM-DD)
+	function formatDate(date) {
+		var year = date.getFullYear();
+		var month = (date.getMonth() + 1).toString().padStart(2, '0');
+		var day = date.getDate().toString().padStart(2, '0');
+		return year + '-' + month + '-' + day;
+	}
+</script>
+
+
+<script type="text/javascript">
+	$(function() {
 		// 전체 선택 체크박스 클릭 이벤트
 		$('#select-all').click(function() {
 			// 체크박스의 체크 상태에 따라 모든 체크박스 선택/해제
@@ -248,6 +295,199 @@ table {
 		});
 	});
 </script>
+
+<!-- 게시물 수 검색  -->
+<script type="text/javascript">
+	$(function() {
+
+		// 카운트 업데이트
+		$('#all .count').text(totalSalesStatusCnt() + ' 건');
+		$('#on-sale .count').text(getSalesCount("판매중") + ' 건');
+		$('#sale-paused .count').text(getSalesCount("판매중지") + ' 건');
+		$('#sale-ended .count').text(getSalesCount("판매종료") + ' 건');
+
+	})// ready
+
+	function totalSalesStatusCnt() {
+		var cnt = 0;
+
+		// AJAX 요청을 통해 판매 수량을 가져옵니다.
+		$.ajax({
+			url : "ordersTotalCnt.jsp",
+			type : "get",
+			async : false,
+			dataType : "json",
+			error : function(xhr) {
+				console.log("Error: " + xhr.status);
+			},
+			success : function(jsonObj) {
+				cnt = jsonObj.rowCnt;
+			}
+		});
+
+		return cnt;
+	}
+
+	function getSalesCount(salesStatus) {
+		var cnt = 0;
+
+		// AJAX 요청을 통해 판매 수량을 가져옵니다.
+		$.ajax({
+			url : "ordersCnt.jsp",
+			type : "get",
+			data : {
+				salesStatus : salesStatus
+			// 선택된 상태만 전달
+			},
+			async : false,
+			dataType : "json",
+			error : function(xhr) {
+				console.log("Error: " + xhr.status);
+			},
+			success : function(jsonObj) {
+				cnt = jsonObj.rowCnt;
+			}
+		});
+
+		return cnt;
+	}// getSalesCount
+</script>
+
+<!-- 배송+주문 상태 변경  -->
+<script type="text/javascript">
+	$(function() {
+		$("#btnSubmit").click(function() {
+			var checkedOrderIds = getCheckedOrderIds();
+			var selecteddeliveryType = $("#sale-type").val();
+			var selectedOrderType = $("#order-type").val();
+
+			// 각 상태 변경 함수 호출
+			if (checkedOrderIds.length > 0) {
+				if (selecteddeliveryType) {
+					updateStatus('updateDeliveryStatus.jsp', {
+						deliveryType : selecteddeliveryType,
+						orderIds : checkedOrderIds
+					});
+				}
+				if (selectedOrderType) {
+					updateStatus('updateCancelStatus.jsp', {
+						orderType : selectedOrderType,
+						orderIds : checkedOrderIds
+					});
+				}
+			} else {
+				alert("변경할 항목을 선택해 주세요.");
+			}
+		});
+	});
+
+	// 체크된 체크박스의 orderId 값을 배열로 반환하는 함수
+	function getCheckedOrderIds() {
+		return $('.chk:checked').map(function() {
+			return $(this).data("orderid");
+		}).get();
+	}
+
+	// 상태 업데이트 함수
+	function updateStatus(url, data) {
+		$.ajax({
+			url : url,
+			method : 'POST',
+			data : data,
+			traditional : true,
+			success : function(response) {
+				alert("변경이 성공적으로 완료되었습니다.");
+			},
+			error : function(xhr) {
+				alert("변경 중 오류가 발생했습니다.");
+				console.log(xhr.status);
+			}
+		});
+	}
+</script>
+
+
+<!-- 선택 삭제 -->
+<script type="text/javascript">
+	$(function() {
+
+		$("#deleteBtn").click(function() {
+
+			deleteData();
+
+		})// click
+	})// ready
+
+	function deleteData() {
+
+		// 체크된 체크박스들의 orderId 값을 배열로 가져옴
+		var checkedOrderIds = $('.chk:checked').map(function() {
+			return $(this).data("orderid");
+		}).get();
+
+		if (checkedOrderIds.length > 0) {
+			// 서버에 데이터 전송
+			$.ajax({
+				url : 'deleteOrder.jsp',
+				method : 'POST',
+				data : {
+					orderIds : checkedOrderIds
+				},
+				traditional : true, // 배열 데이터를 서버에 보낼 때 사용
+				success : function(response) {
+					alert("삭제가 성공적으로 완료되었습니다.");
+				},
+				error : function(xhr) {
+					alert("삭제 중 오류가 발생했습니다.");
+					console.log(xhr.status);
+				}
+			});
+		} else {
+			alert("삭제할 항목을 선택해 주세요.");
+		}
+
+	}// deleteData
+</script>
+
+<!-- 검색어 입력 -->
+<script type="text/javascript">
+	$(function() {
+
+		// 검색 버튼 클릭 시 검색 실행
+		$("#search-btn").click(function() {
+			chkNull();
+		});
+
+		$("#reset-btn").click(function() {
+			resetForm();
+		});
+
+	});
+
+	/* 검색어 체크 */
+	function chkNull() {
+
+		var startDate = $("#start-date").val();
+		var endDate = $("#end-date").val();
+
+		// start-date와 end-date 값이 반드시 필요
+		if (!startDate || !endDate) {
+			alert("검색 기간을 설정해 주세요.");
+			return;
+		}
+
+		$("#searchFrm").submit();
+	}
+
+	// 초기화 버튼
+	function resetForm() {
+
+		// URL 파라미터 제거
+		history.replaceState({}, '', location.pathname);
+		location.reload();
+	}
+</script>
+
 </head>
 <body>
 
@@ -330,80 +570,87 @@ table {
 
 		<!-- 상태 아이콘 -->
 		<div class="content-box" id="status-container">
-			<div class="status-item">
+			<div class="status-item" id="all">
 				<div class="icon all"></div>
-				<span>전체</span> <span><%=sVO.getTotalCount()%> 건</span>
+				<span>전체</span> <span class="count">0 건</span>
 			</div>
-			<div class="status-item">
+			<div class="status-item" id="on-sale">
 				<div class="icon on-sale"></div>
-				<span>구매확정</span> <span>0 건</span>
+				<span>구매확정</span> <span class="count">0 건</span>
 			</div>
-			<div class="status-item">
-				<div class="icon no-sale"></div>
-				<span>구매 미정</span> <span>0 건</span>
-			</div>
-			<div class="status-item">
+			<div class="status-item" id="sale-paused">
 				<div class="icon sale-paused"></div>
-				<span>취소요청</span> <span>1 건</span>
+				<span>결제대기</span> <span class="count">0 건</span>
+			</div>
+			<div class="status-item" id="sale-ended">
+				<div class="icon sale-ended"></div>
+				<span>취소요청</span> <span class="count">0 건</span>
 			</div>
 		</div>
 
 		<!-- 검색 섹션 -->
 		<div class="content-box" id="search-container">
-			<!-- 주문 상태 선택 -->
-			<div class="search-item">
+			<form action="salesList.jsp" method="get" id="searchFrm"
+				name="searchFrm">
+				<!-- 주문 상태 선택 -->
+				<div class="search-item">
+					<div class="radio-group">
+						<label>주문상태</label> <label><input type="radio"
+							name="order-status" value="" checked="checked"> 전체</label> <label><input
+							type="radio" name="order-status" value="구매확정"> 구매확정</label> <label><input
+							type="radio" name="order-status" value="구매 미정"> 구매 미정</label> <label><input
+							type="radio" name="order-status" value="취소요청"> 취소요청</label>
+					</div>
 
-				<div class="checkbox-group">
-					<label>주문상태</label><label><input type="checkbox"
-						name="sales-status" value="전체"> 전체</label> <label><input
-						type="checkbox" name="sales-status" value="구매확정"> 구매확정</label> <label><input
-						type="checkbox" name="sales-status" value="구매 미정"> 구매 미정</label> <label><input
-						type="checkbox" name="sales-status" value="취소요청"> 취소요청</label>
 				</div>
-			</div>
+				<br>
 
-			<!-- 조회 기간 선택 -->
-			<div class="search-item">
-				<label for="date-range">조회 기간</label> <select id="date-range">
-					<option value="today">오늘</option>
-					<option value="1-week">1주일</option>
-					<option value="1-month">1개월</option>
-					<option value="3-months">3개월</option>
-					<option value="6-months">6개월</option>
-					<option value="1-year">1년</option>
-				</select> <input type="date" id="start-date"> <input type="date"
-					id="end-date">
-			</div>
+				<!-- 조회 기간 선택 -->
+				<div class="search-item">
+					<label for="date-range">조회 기간</label> <select id="date-range">
+						<option value="today">오늘</option>
+						<option value="1-week">1주일</option>
+						<option value="1-month">1개월</option>
+						<option value="3-months">3개월</option>
+						<option value="6-months">6개월</option>
+						<option value="1-year">1년</option>
+					</select> <input type="date" id="start-date"> <input type="date"
+						id="end-date">
+				</div>
 
-			<!-- 검색 및 초기화 버튼 -->
-			<div class="search-item button-group">
-				<button id="search-btn" class="btn-search">검색</button>
-				<input type="reset" id="reset-btn" class="btn-reset" value="초기화">
-			</div>
+				<br>
+				<!-- 검색 및 초기화 버튼 -->
+				<div class="search-item button-group">
+					<button id="search-btn" class="btn-search">검색</button>
+					<input type="reset" id="reset-btn" class="btn-reset" value="초기화">
+				</div>
+			</form>
 		</div>
 
 
 
 
-		<!-- 상품 목록 -->
+		<!-- 주문 목록 -->
 		<div class="content-box" id="content-box4">
 			<div class="product-list-actions">
 				<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
 				<div class="product-count">
-					<span>상품 목록(총 <%=sVO.getTotalCount()%>개)
-					</span>
-					<button type="submit" class="select-delete-btn">선택삭제</button>
+					<span>주문 목록(총 <%=sVO.getTotalCount()%>개)
+					</span> <input type="button" id="deleteBtn" class="select-delete-btn"
+						value="선택삭제">
 				</div>
 
-				<!-- 교환처리, 취소처리 버튼 -->
-				<div class="action-buttons">
-					<button id="cancel-button">취소 처리</button>
-				</div>
-
+				<!-- 교환처리, 주문상태 -->
 				<div class="product-count">
-					<select id="sale-type" class="form-select"
+					<select id="order-type" name="order-type" class="form-select"
 						aria-label="Default select example">
-						<option value="배송상태">배송상태</option>
+						<option value="">주문상태</option>
+						<option value="구매확정">구매확정</option>
+						<option value="결제대기">결제대기</option>
+						<option value="취소요청">취소요청</option>
+					</select> <select id="sale-type" name="sale-type" class="form-select"
+						aria-label="Default select example">
+						<option value="">배송상태</option>
 						<option value="베송준비">배송준비</option>
 						<option value="배송중">배송중</option>
 						<option value="배송완료">배송완료</option>
@@ -429,9 +676,20 @@ table {
 				</thead>
 
 				<tbody>
+
+
+					<c:if test="${ empty saleslist }">
+						<tr>
+							<td style="text-align: center" colspan="6">조회 가능한 항목이 없습니다.<br>
+							</td>
+						</tr>
+					</c:if>
+
+
 					<c:forEach var="item" items="${saleslist}">
 						<tr>
-							<td><input type="checkbox" class="chk"></td>
+							<td><input type="checkbox" class="chk"
+								data-orderId="${item.orderId}"></td>
 							<td>${item.orderId}</td>
 							<td>${item.orderName}</td>
 							<td>${item.orderStatus}</td>
@@ -450,7 +708,8 @@ table {
 
 			<!-- 저장 버튼 -->
 			<div class="search-item button-group">
-				<button id="submit" class="btn-save">수정 항목 저장</button>
+				<input type="button" id="btnSubmit" class="btn-save"
+					value="수정 항목 저장">
 			</div>
 
 

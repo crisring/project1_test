@@ -7,8 +7,8 @@ public class ProductVO {
 
 	private int productId, catalog, size, price, salePrice, stockQuantity, discount_price;
 	// 상품번호, 카탈로그번호, 선택 사이즈, 가격, 할인가격, 수량, 할인가
-	private int[] subimgId;
-	private String imgName, description, productName, modelName, brand, saleStatus;
+	private int[] subimgId, standardSize; // 서브이미지 ID, 표준 신발 사이즈
+	private String mainImg, description, productName, modelName, brand, saleStatus;
 	// 메인이미지, 상세설명, 상품명, 모델명, 브랜드명, 판매상태
 
 	private String[] sizes;
@@ -62,12 +62,12 @@ public class ProductVO {
 		this.subimgId = subimgId;
 	}
 
-	public String getImgName() {
-		return imgName;
+	public String getMainImg() {
+		return mainImg;
 	}
 
-	public void setImgName(String imgName) {
-		this.imgName = imgName;
+	public void setMainImg(String mainImg) {
+		this.mainImg = mainImg;
 	}
 
 	public int getStockQuantity() {
@@ -150,14 +150,22 @@ public class ProductVO {
 		this.finishAt = finishAt;
 	}
 
+	public int[] getStandardSize() {
+		return standardSize;
+	}
+
+	public void setStandardSize(int[] standardSize) {
+		this.standardSize = standardSize;
+	}
+
 	@Override
 	public String toString() {
 		return "ProductVO [productId=" + productId + ", catalog=" + catalog + ", size=" + size + ", price=" + price
 				+ ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity + ", discount_price=" + discount_price
-				+ ", subimgId=" + Arrays.toString(subimgId) + ", imgName=" + imgName + ", description=" + description
-				+ ", productName=" + productName + ", modelName=" + modelName + ", brand=" + brand + ", saleStatus="
-				+ saleStatus + ", sizes=" + Arrays.toString(sizes) + ", createAt=" + createAt + ", finishAt=" + finishAt
-				+ "]";
+				+ ", subimgId=" + Arrays.toString(subimgId) + ", standardSize=" + Arrays.toString(standardSize)
+				+ ", mainImg=" + mainImg + ", description=" + description + ", productName=" + productName
+				+ ", modelName=" + modelName + ", brand=" + brand + ", saleStatus=" + saleStatus + ", sizes="
+				+ Arrays.toString(sizes) + ", createAt=" + createAt + ", finishAt=" + finishAt + "]";
 	}
 
 }

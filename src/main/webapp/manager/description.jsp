@@ -1,9 +1,11 @@
+<%@page import="manager.productlist.AdminProductManagementDAO"%>
+<%@page import="manager.productlist.ProductVO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" info=""%>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8UTF-8">
+<meta charset="UTF-8">
 <title>상세설명</title>
 <link rel="shortcut icon"
 	href="http://192.168.10.219/jsp_prj/common/images/favicon.ico" />
@@ -50,23 +52,43 @@ button:hover {
 	src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script type="text/javascript">
 	$(function() {
-
 		$("#save-button").click(function() {
-			alert("저장되었습니다!");
-			close();
-		});
+			const description = $("#newDescription").val();
+			const productId = $("#productId").val();
 
-	}); // document.ready
+			$.ajax({
+				type : "POST",
+				url : "updateDescription.jsp",
+				data : {
+					productId : productId,
+					description : description
+				},
+				success : function(response) {
+					alert("저장되었습니다!");
+					close();2
+				},
+				error : function(xhr, status, error) {
+					console.error("Error occurred: ", error);
+					alert("저장 중 오류가 발생했습니다. 다시 시도해 주세요.");
+				}
+			});
+		});
+	});
 </script>
 </head>
 <body>
-	<h2>상세 설명 수정</h2>
+	<%
+	int productId = Integer.parseInt(request.getParameter("productId"));
 
+	AdminProductManagementDAO apmDAO = AdminProductManagementDAO.getInstance();
+	ProductVO pVO = apmDAO.selectByProductId(productId);
+	%>
+
+	<h2>상세 설명 수정</h2>
 	<form id="descriptionForm" method="post">
 		<label for="newDescription">새로운 설명:</label>
-		<textarea id="newDescription" name="newDescription">
-            <%=request.getParameter("explanation")%> <!-- 전달된 설명 값 표시 -->
-        </textarea>
+		<textarea id="newDescription" name="newDescription"><%=pVO.getDescription()%></textarea>
+		<input type="hidden" id="productId" value="<%=pVO.getProductId()%>" />
 		<br> <br> <input type="button" id="save-button" value="저장">
 	</form>
 </body>

@@ -2,110 +2,88 @@ package manager.util;
 
 public class BoardUtil {
 
-	private static String[] columnName = { "product_name", "brand" };
-
-	public static String numToField(String fieldNum) {
-
-		return columnName[Integer.parseInt(fieldNum)];
-
-	}// numToField
-
 	/**
 	 * 페이지네이션을 사용하면 매개변수로 입력되는 객체의 현재 페이지번호, 전체 페이지수, 검색 수 <br>
-	 * 검색을 수행하면 field, keyword, url이 반드시 입력되어야합니다.
+	 * 검색을 수행하면 field, url이 반드시 입력되어야합니다.
 	 * 
 	 * @param sVO
 	 * @return
 	 */
-	public String pagination(SearchVO sVO) {
 
+	public String pagination(SearchVO sVO) {
 		StringBuilder pagination = new StringBuilder();
 
-		/* 검색 수가 0이 아닐때만 페이지네이션을 보여줌 */
+		// 검색 수가 0이 아닐 때만 페이지네이션을 보여줌
 		if (sVO.getTotalCount() != 0) {
-			// 1.한 화면에 보여줄 페이지 인덱스 수 [1][2][3]
 			int pageNumber = 3;
-			// 2.화면에 보여줄 시작페이지 번호 ( 1,2,3 -> 1, 4,5,6 ->4, 7,8,9 -> 7)
 			int startPage = ((sVO.getCurrentPage() - 1) / pageNumber) * pageNumber + 1;
-			// 3.화면에 보여줄 마지막페이지 번호
 			int endPage = startPage + pageNumber - 1;
-			// 4. 총 페이지 수가 연산된 마지막 페이지 수보다 작다면 총 페이지수가 마지막 페이지수로 설정
 			if (sVO.getTotalPage() <= endPage) {
 				endPage = sVO.getTotalPage();
-			} // end
-				// 5.첫 페이지가 인덱스화면이 아닌경우 (3보다 큰 경우)
-			int movePage = 0;
+			}
+
+			// 이전 페이지 링크
 			StringBuilder prevMark = new StringBuilder();
-			prevMark.append("[ &lt;&lt; ]");
-
-			if (sVO.getCurrentPage() > pageNumber) {// 현재 페이지가 pagination의 수 보다 크면
-				prevMark.delete(0, prevMark.length());
-
-				// 이전으로 가기 링크를 만들어 준다.
-				movePage = startPage - 1;// 4,5,6->1, 7,8,9 -> 4
+			if (sVO.getCurrentPage() > pageNumber) {
+				int movePage = startPage - 1;
 				prevMark.append("[ <a href=\"").append(sVO.getUrl()).append("?currentPage=").append(movePage);
-
-				// 검색 키워드가 존재할 떄
-				if (sVO.getKeyword() != null && !"".equals(sVO.getKeyword())) {
-					prevMark.append("&field=").append(sVO.getField()).append("&keyword=").append(sVO.getKeyword());
-				}
-
+				appendParameters(prevMark, sVO);
 				prevMark.append("\">&lt;&lt;</a> ]");
-			} // end if
-			prevMark.append(" ... ");
+			} else {
+				prevMark.append("[ &lt;&lt; ]");
+			}
+			pagination.append(prevMark).append(" ... ");
 
-			pagination.append(prevMark);
-
-			movePage = startPage;
-			StringBuilder pageLink = new StringBuilder();
-
-			while (movePage <= endPage) {
-				if (movePage == sVO.getCurrentPage()) {// 현재 페이지는 링크를 설정하지 않는다.
-					pageLink.append("[ " + movePage + " ]");
+			// 페이지 번호 링크
+			for (int i = startPage; i <= endPage; i++) {
+				if (i == sVO.getCurrentPage()) {
+					pagination.append("[ ").append(i).append(" ]");
 				} else {
-					pageLink.append("[ <a href='").append(sVO.getUrl()).append("?currentPage=").append(movePage);
-
-					pageLink.append("'>" + movePage + "</a> ]");
-
-					// 검색 키워드가 존재할 떄
-					if (sVO.getKeyword() != null && !"".equals(sVO.getKeyword())) {
-
-						prevMark.append("&field=").append(sVO.getField()).append("&keyword=").append(sVO.getKeyword());
-
-					}
-
+					pagination.append("[ <a href=\"").append(sVO.getUrl()).append("?currentPage=").append(i);
+					appendParameters(pagination, sVO);
+					pagination.append("\">").append(i).append("</a> ]");
 				}
+			}
 
-				movePage++;
-			} // end while
-
-			pagination.append(pageLink);
 			pagination.append(" ... ");
 
-			// 7.뒤에 페이지가 더 있는 경우
+			// 다음 페이지 링크
 			StringBuilder nextMark = new StringBuilder();
-			nextMark.append("[ &gt;&gt; ]");
-
 			if (sVO.getTotalPage() > endPage) {
-
-				nextMark.delete(0, nextMark.length());
-				movePage = endPage + 1;
-				nextMark.append("[ <a href='").append(sVO.getUrl()).append("?currentPage=").append(movePage);
-
-				// 검색 키워드가 존재할 떄
-				if (sVO.getKeyword() != null && !"".equals(sVO.getKeyword())) {
-					nextMark.append("&field=").append(sVO.getField()).append("&keyword=").append(sVO.getKeyword());
-				}
-
-				nextMark.append("'> &gt;&gt;</a> ]");
-			} // end if
+				int movePage = endPage + 1;
+				nextMark.append("[ <a href=\"").append(sVO.getUrl()).append("?currentPage=").append(movePage);
+				appendParameters(nextMark, sVO);
+				nextMark.append("\"> &gt;&gt;</a> ]");
+			} else {
+				nextMark.append("[ &gt;&gt; ]");
+			}
 
 			pagination.append(nextMark);
-
-		} // end if
+		}
 
 		return pagination.toString();
+	}
 
-	}// pagination
+	// 공통 검색 조건 추가 함수
+	private void appendParameters(StringBuilder sb, SearchVO sVO) {
+		if (sVO.getProductName() != null && !sVO.getProductName().isEmpty()) {
+			sb.append("&productName=").append(sVO.getProductName());
+		}
+		if (sVO.getBrand() != null && !sVO.getBrand().isEmpty()) {
+			sb.append("&brand=").append(sVO.getBrand());
+		}
+		if (sVO.getSaleStatus() != null && !sVO.getSaleStatus().isEmpty()) {
+			sb.append("&saleStatus=").append(sVO.getSaleStatus());
+		}
+		if (sVO.getStartDate() != null && !sVO.getStartDate().isEmpty()) {
+			sb.append("&startDate=").append(sVO.getStartDate());
+		}
+		if (sVO.getEndDate() != null && !sVO.getEndDate().isEmpty()) {
+			sb.append("&endDate=").append(sVO.getEndDate());
+		}
+		if (sVO.getSortBy() != null && !sVO.getSortBy().isEmpty()) {
+			sb.append("&sortBy=").append(sVO.getSortBy());
+		}
+	}
 
-}
+}// class
