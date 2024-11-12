@@ -4,9 +4,12 @@ package manager.util;
  * 현재페이지, 시작번호, 끝 번호, 검색컬럼, 검색값, 검색URL
  */
 public class SearchVO {
-	private int startNum, endNum, currentPage, totalPage, totalCount; // 시작번호, 끝번호, 현재 페이지 번호, 총 페이지 수
+	private int startNum, endNum, currentPage, totalPage, totalCount, pageScale;
+	// 시작번호, 끝번호, 현재 페이지 번호, 총 페이지 수, 페이지스캐일
+
 	private String brand, productName, saleStatus, startDate, endDate, dateType, sortBy;
 	// 검색할 브랜드, 상품명, 판매상태, 기간, 조회기간, 정렬기준
+
 	private String url, OrderStatus; // url, 주문상태
 
 	public int getStartNum() {
@@ -121,12 +124,21 @@ public class SearchVO {
 		OrderStatus = orderStatus;
 	}
 
+	public int getPageScale() {
+		return pageScale;
+	}
+
+	public void setPageScale(int pageScale) {
+		this.pageScale = pageScale;
+	}
+
 	@Override
 	public String toString() {
 		return "SearchVO [startNum=" + startNum + ", endNum=" + endNum + ", currentPage=" + currentPage + ", totalPage="
-				+ totalPage + ", totalCount=" + totalCount + ", brand=" + brand + ", productName=" + productName
-				+ ", saleStatus=" + saleStatus + ", startDate=" + startDate + ", endDate=" + endDate + ", dateType="
-				+ dateType + ", sortBy=" + sortBy + ", url=" + url + ", OrderStatus=" + OrderStatus + "]";
+				+ totalPage + ", totalCount=" + totalCount + ", pageScale=" + pageScale + ", brand=" + brand
+				+ ", productName=" + productName + ", saleStatus=" + saleStatus + ", startDate=" + startDate
+				+ ", endDate=" + endDate + ", dateType=" + dateType + ", sortBy=" + sortBy + ", url=" + url
+				+ ", OrderStatus=" + OrderStatus + "]";
 	}
 
 }

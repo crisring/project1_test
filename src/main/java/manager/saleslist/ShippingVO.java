@@ -1,4 +1,4 @@
-package manager.productlist;
+package manager.saleslist;
 
 public class ShippingVO {
 

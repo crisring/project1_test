@@ -446,7 +446,6 @@ function updateTotalPrice() {
 			isSaving = true;
 			
 			if(chkNull()){
-				uploadImg();
 				updateData();
 			}
 			
@@ -591,12 +590,8 @@ function chkNull() {
 	            productId : productId
 	        },
 	        success: function(response) {
-	            if (response.includes("제품이 성공적으로 변경되었습니다.")) {
 	                alert(response);
 	                location.href = "productList.jsp";
-	            } else {
-	                alert(response);
-	            }
 	        },
 	        error: function(xhr) {
 	            alert("데이터 변경 중 오류가 발생했습니다: " + xhr.statusText);
@@ -604,26 +599,70 @@ function chkNull() {
 	    }); // ajax
 
 	} // insertData
-	
-	function uploadImg(){
+</script>
 
-		// 업로드 가능 확장자는 이미지 관련 확장자만 가능하도록 유효성 검증을 해야한다.
-		// jpg, gif, png, bmp 확장자만 업로드 가능
-		// 위의 확장자가 아니면 alert("업로드 가능 확장자가 아닙니다.")를 보여주고 return
-		allowedExtensions = /(\.jpg|\.jpeg|\.gif|\.png|\.bmp)$/i;
-		var mainImage = $("#mainImage").val();
-		
-		var additionalImgName = Array.from($("#additionalImages")[0].files).map(file => file.name);
+<!-- 이미지 처리 -->
+<script type="text/javascript">
+$(document).ready(function() {
+    // 파일 유효성 검사 함수
+    function chkFile() {
+        // 업로드 가능한 확장자
+        const allowedExtensions = /(\.jpg|\.jpeg|\.gif|\.png|\.bmp)$/i;
 
-		if (!allowedExtensions.exec(mainImage)) {
-			alert("업로드 가능 확장자가 아닙니다.");
-			return;
-		}
-		$("#frm").submit();
-	}
-	
+        // 대표 이미지 추가
+        var mainImage = $('#mainImage')[0].files[0];
+        if (mainImage) {
+            if (!allowedExtensions.exec(mainImage.name)) {
+                alert('대표 이미지는 jpg, jpeg, gif, png, bmp 형식만 업로드 가능합니다.');
+                return false;  // 유효하지 않으면 false
+            }
+        }
 
+        // 추가 이미지 추가 (최대 5개)
+        var additionalImages = $('#additionalImages')[0].files;
+        for (var i = 0; i < additionalImages.length; i++) {
+            if (!allowedExtensions.exec(additionalImages[i].name)) {
+                alert('추가 이미지는 jpg, jpeg, gif, png, bmp 형식만 업로드 가능합니다.');
+                return false;  // 유효하지 않으면 false
+            }
+        }
 
+        return true;  // 모든 파일이 유효하면 true 반환
+    }
+
+    $('#uploadBtn').on('click', function() {
+        // 파일 유효성 검사
+        if (chkFile()) {
+            var formData = new FormData();
+
+            // 대표 이미지 추가
+            var mainImage = $('#mainImage')[0].files[0];
+            if (mainImage) {
+                formData.append('mainImage', mainImage);
+            }
+
+            // 추가 이미지 추가 (최대 5개)
+            var additionalImages = $('#additionalImages')[0].files;
+            for (var i = 0; i < additionalImages.length; i++) {
+                formData.append('additionalImages', additionalImages[i]);
+            }
+
+            $.ajax({
+                url: 'upload.jsp',  // 업로드를 처리할 JSP 파일 경로
+                type: 'POST',
+                data: formData,
+                processData: false,  // FormData 객체를 사용할 때는 processData를 false로 설정
+                contentType: false,  // multipart/form-data로 전송하므로 contentType을 false로 설정
+                success: function(response) {
+                    alert(response);
+                },
+                error: function(xhr, status, error) {
+                    alert('파일 업로드 실패: ' + error);
+                }
+            });
+        }
+    });
+});
 </script>
 
 </head>
@@ -752,36 +791,33 @@ function chkNull() {
 			<!-- 상품 이미지 -->
 
 			<div class="content-box" id="image-container">
+				<strong>상품 이미지</strong>
+				<div>
+					<strong>대표이미지 <span class="essential">*</span></strong> <input
+						type="file" id="mainImage" name="mainImage" accept="image/*">
 
-				<form action="upload_process.jsp" method="post"
-					enctype="multipart/form-data" id="frm" name="frm">
+					<strong>추가이미지 (최대 5개)</strong> <input type="file"
+						id="additionalImages" name="additionalImages" accept="image/*"
+						multiple>
 
+					<button type="button" id="uploadBtn">이미지 업로드</button>
+				</div>
 
-					<strong>상품 이미지</strong>
+				<!-- 미리보기 영역 -->
+				<div class="preview-container">
+					<strong>미리보기</strong>
 					<div>
-						<strong>대표이미지 <span class="essential">*</span></strong> <input
-							type="file" id="mainImage" name="mainImage" accept="image/*">
-						<strong>추가이미지 (최대 5개)</strong> <input type="file"
-							id="additionalImages" accept="image/*" multiple>
+						<!-- 초기 이미지 표시 또는 새로운 이미지 미리보기 -->
+						<img id="mainImagePreview"
+							src='<%=pVO.getMainImg() != null ? "images/" + pVO.getMainImg() : ""%>'
+							alt="대표이미지 미리보기"
+							style='<%=pVO.getMainImg() != null ? "display: block" : "display: none"%>'>
+						<div id="additionalImagePreviews"
+							style="display: flex; flex-wrap: wrap;"></div>
 					</div>
-
-					<!-- 미리보기 영역 -->
-					<div class="preview-container">
-						<strong>미리보기</strong>
-						<div>
-							<!-- 초기 이미지 표시 또는 새로운 이미지 미리보기 -->
-							<img id="mainImagePreview"
-								src='<%=pVO.getMainImg() != null ? "images/" + pVO.getMainImg() : ""%>'
-								alt="대표이미지 미리보기"
-								style='<%=pVO.getMainImg() != null ? "display: block" : "display: none"%>'>
-							<div id="additionalImagePreviews"
-								style="display: flex; flex-wrap: wrap;"></div>
-						</div>
-					</div>
-					<strong>상세설명 <span class="essential">*</span></strong>
-					<textarea rows="4" cols="50"><%=pVO.getDescription()%></textarea>
-
-				</form>
+				</div>
+				<strong>상세설명 <span class="essential">*</span></strong>
+				<textarea rows="4" cols="50"><%=pVO.getDescription()%></textarea>
 			</div>
 
 

@@ -87,6 +87,10 @@ public class BoardUtil {
 		if (sVO.getOrderStatus() != null && !sVO.getOrderStatus().isEmpty()) {
 			sb.append("&orderStatus=").append(sVO.getOrderStatus());
 		}
+		// pageScale 파라미터 추가
+		if (sVO.getPageScale() > 0) {
+			sb.append("&pageScale=").append(sVO.getPageScale());
+		}
 	}
 
 }// class

@@ -2,7 +2,7 @@
 <%@page import="manager.util.BoardUtil"%>
 <%@page import="java.sql.SQLException"%>
 <%@page import="manager.saleslist.AdminSalesManagementDAO"%>
-<%@page import="manager.productlist.OrderVO"%>
+<%@page import="manager.saleslist.OrderVO"%>
 <%@page import="java.util.List"%>
 <%@page import="manager.productlist.AdminProductManagementDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -361,19 +361,28 @@ table {
 			var selecteddeliveryType = $("#sale-type").val();
 			var selectedOrderType = $("#order-type").val();
 
-			// 각 상태 변경 함수 호출
 			if (checkedOrderIds.length > 0) {
-				if (selecteddeliveryType) {
-					updateStatus('updateDeliveryStatus.jsp', {
-						deliveryType : selecteddeliveryType,
-						orderIds : checkedOrderIds
+				if (selecteddeliveryType || selectedOrderType) {
+					$.ajax({
+						url : 'updateBothStatus.jsp',
+						type : 'POST',
+						data : {
+							deliveryType : selecteddeliveryType,
+							orderType : selectedOrderType,
+							orderIds : checkedOrderIds
+						},
+						traditional : true,
+						success : function(response) {
+							alert("변경이 성공적으로 완료되었습니다.");
+							location.reload();
+						},
+						error : function(xhr) {
+							alert("변경 중 오류가 발생했습니다.");
+							console.log(xhr.status);
+						}
 					});
-				}
-				if (selectedOrderType) {
-					updateStatus('updateCancelStatus.jsp', {
-						orderType : selectedOrderType,
-						orderIds : checkedOrderIds
-					});
+				} else {
+					alert("변경할 상태를 선택해주세요.");
 				}
 			} else {
 				alert("변경할 항목을 선택해 주세요.");
@@ -412,7 +421,6 @@ table {
 	$(function() {
 
 		$("#deleteBtn").click(function() {
-			alert("hi");
 			deleteData();
 
 		})// click
@@ -729,8 +737,8 @@ table {
 
 			<!-- 저장 버튼 -->
 			<div class="search-item button-group">
-				<input type="button" id="btnSubmit" class="btn-save"
-					value="수정 항목 저장">
+				<input type="button" id="btnSubmit" name="btnSubmit"
+					class="btn-save" value="수정 항목 저장">
 			</div>
 
 

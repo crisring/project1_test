@@ -272,8 +272,16 @@ try {
 	se.printStackTrace();
 }
 
-// 페이지당 보여줄 게시물 수
+//페이지당 보여줄 게시물 수
 int pageScale = 10;
+String paramPageScale = request.getParameter("pageScale");
+if (paramPageScale != null && !paramPageScale.trim().isEmpty()) {
+	try {
+		pageScale = Integer.parseInt(paramPageScale);
+	} catch (NumberFormatException e) {
+		pageScale = 10; // 파싱 실패시 기본값 사용
+	}
+}
 
 // 총 페이지 수 계산
 int totalPage = (int) Math.ceil((double) totalCount / pageScale);
@@ -678,6 +686,51 @@ request.setAttribute("sortBy", sortBy);
 	}// deleteData
 </script>
 
+
+<script type="text/javascript">
+	$(function() {
+
+		$('#count_product').on(
+				'change',
+				function() {
+					// 현재 URL 가져오기
+					let currentUrl = new URL(window.location.href);
+					let searchParams = currentUrl.searchParams;
+
+					// 기존 파라미터 유지
+					let productName = searchParams.get('product-name') || '';
+					let brand = searchParams.get('brand') || '';
+					let salesStatus = searchParams.get('sales-status') || '';
+					let dateType = searchParams.get('date-type') || '';
+					let startDate = searchParams.get('start-date') || '';
+					let endDate = searchParams.get('end-date') || '';
+					let sortBy = searchParams.get('sortBy') || '';
+
+					// 새로운 URL 생성
+					let newUrl = 'productList.jsp?'
+							+ 'pageScale='
+							+ $(this).val()
+							+ (productName ? '&product-name='
+									+ encodeURIComponent(productName) : '')
+							+ (brand ? '&brand=' + encodeURIComponent(brand)
+									: '')
+							+ (salesStatus ? '&sales-status='
+									+ encodeURIComponent(salesStatus) : '')
+							+ (dateType ? '&date-type='
+									+ encodeURIComponent(dateType) : '')
+							+ (startDate ? '&start-date='
+									+ encodeURIComponent(startDate) : '')
+							+ (endDate ? '&end-date='
+									+ encodeURIComponent(endDate) : '')
+							+ (sortBy ? '&sortBy=' + encodeURIComponent(sortBy)
+									: '') + '&currentPage=1'; // 페이지 수가 변경되면 첫 페이지로 이동
+
+					// 페이지 이동
+					window.location.href = newUrl;
+				});
+	}); // ready
+</script>
+
 </head>
 <body>
 
@@ -781,14 +834,14 @@ request.setAttribute("sortBy", sortBy);
 
 					<!-- hidden으로 값 설정 -->
 					<input type="hidden" id="pramProduct" name="pramProduct"
-						value="${productName}" /> <input type="hidden" id="paramBrand"
-						name="paramBrand" value="${brand}" /> <input type="hidden"
-						id="paramStatus" name="paramStatus" value="${salesStatus}" /> <input
-						type="hidden" id="paramDateType" name="paramDateType"
-						value="${dateType}" /> <input type="hidden" id="paramStartDate"
-						name="paramStartDate" value="${startDate}" /> <input
-						type="hidden" id="paramEndDate" name="paramEndDate"
-						value="${endDate}" />
+						value="${productName}"> <input type="hidden"
+						id="paramBrand" name="paramBrand" value="${brand}"> <input
+						type="hidden" id="paramStatus" name="paramStatus"
+						value="${salesStatus}"> <input type="hidden"
+						id="paramDateType" name="paramDateType" value="${dateType}">
+					<input type="hidden" id="paramStartDate" name="paramStartDate"
+						value="${startDate}"> <input type="hidden"
+						id="paramEndDate" name="paramEndDate" value="${endDate}">
 
 					<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
 					<div class="product-count">
@@ -800,9 +853,9 @@ request.setAttribute("sortBy", sortBy);
 							<option value="PRICE DESC">판매가 높은순</option>
 
 						</select> <select id="count_product" name="count_product">
-							<option value="10">10개씩</option>
-							<option value="20">20개씩</option>
-							<option value="30">30개씩</option>
+							<option value="10" <%=pageScale == 10 ? "selected" : ""%>>10개씩</option>
+							<option value="5" <%=pageScale == 5 ? "selected" : ""%>>5개씩</option>
+							<option value="15" <%=pageScale == 15 ? "selected" : ""%>>15개씩</option>
 						</select>
 					</div>
 

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.co.sist.dao.DbConnection;
-import manager.productlist.OrderVO;
 
 public class AdminSalesManagementDAO {
 
@@ -412,5 +411,66 @@ public class AdminSalesManagementDAO {
 		}
 		return totalCount;
 	}// selectOrdersStatusCount
+
+	/**
+	 * orderID를 받아와서 주문상태, 배송상태 변경
+	 * 
+	 * @param orderStatus
+	 * @param deliveryStatus
+	 * @param orderIds
+	 * @return
+	 * @throws SQLException
+	 */
+	public int updateDeliveryOrderStatus(String orderStatus, String deliveryStatus, int[] orderIds)
+			throws SQLException {
+		int rowCnt = 0;
+		Connection con = null;
+		PreparedStatement pstmtOrder = null;
+		PreparedStatement pstmtDelivery = null;
+		DbConnection dbCon = DbConnection.getInstance();
+
+		try {
+			con = dbCon.getConn();
+			con.setAutoCommit(false); // 트랜잭션 시작
+
+			// 주문상태가 있을 경우
+			if (orderStatus != null && !orderStatus.isEmpty()) {
+				String updateOrderSql = "UPDATE ORDERS SET ORDER_STATUS = ? WHERE ORDER_ID = ?";
+				pstmtOrder = con.prepareStatement(updateOrderSql);
+
+				for (int orderId : orderIds) {
+					pstmtOrder.setString(1, orderStatus);
+					pstmtOrder.setInt(2, orderId);
+					rowCnt += pstmtOrder.executeUpdate();
+				}
+			}
+
+			// 배송상태가 있을 경우
+			if (deliveryStatus != null && !deliveryStatus.isEmpty()) {
+				String updateDeliverySql = "UPDATE DELIVERY SET STATUS = ? WHERE ORDER_ID = ?";
+				pstmtDelivery = con.prepareStatement(updateDeliverySql);
+
+				for (int orderId : orderIds) {
+					pstmtDelivery.setString(1, deliveryStatus);
+					pstmtDelivery.setInt(2, orderId);
+					rowCnt += pstmtDelivery.executeUpdate();
+				}
+			}
+
+			con.commit(); // 트랜잭션 커밋
+		} catch (SQLException e) {
+			if (con != null)
+				con.rollback();
+			throw e;
+		} finally {
+			if (con != null)
+				con.setAutoCommit(true);
+			if (pstmtDelivery != null)
+				pstmtDelivery.close();
+			dbCon.dbClose(null, pstmtOrder, con);
+		}
+
+		return rowCnt;
+	}
 
 }

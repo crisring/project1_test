@@ -1,4 +1,4 @@
-package manager.productlist;
+package manager.saleslist;
 
 import java.util.Date;
 
