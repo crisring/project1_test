@@ -361,6 +361,8 @@ table {
 			var selecteddeliveryType = $("#sale-type").val();
 			var selectedOrderType = $("#order-type").val();
 
+			alert(selecteddeliveryType + " / " + selectedOrderType)
+
 			if (checkedOrderIds.length > 0) {
 				if (selecteddeliveryType || selectedOrderType) {
 					$.ajax({
