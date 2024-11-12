@@ -84,6 +84,9 @@ public class BoardUtil {
 		if (sVO.getSortBy() != null && !sVO.getSortBy().isEmpty()) {
 			sb.append("&sortBy=").append(sVO.getSortBy());
 		}
+		if (sVO.getOrderStatus() != null && !sVO.getOrderStatus().isEmpty()) {
+			sb.append("&orderStatus=").append(sVO.getOrderStatus());
+		}
 	}
 
 }// class

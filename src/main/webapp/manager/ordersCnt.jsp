@@ -1,4 +1,4 @@
-<%@page import="manager.productlist.AdminProductManagementDAO"%>
+<%@page import="manager.saleslist.AdminSalesManagementDAO"%>
 <%@page import="org.json.simple.JSONObject"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" info=""%>
@@ -7,16 +7,16 @@ JSONObject jsonObj = new JSONObject();
 int cnt = 0;
 
 try {
-	String salesStatus = request.getParameter("salesStatus");
+	String ordersStatus = request.getParameter("ordersStatus");
 
 	// salesStatus가 null이 아니고 비어있지 않은지 확인
-	if (salesStatus != null && !salesStatus.isEmpty()) {
-		AdminProductManagementDAO apmDAO = AdminProductManagementDAO.getInstance();
-		cnt = apmDAO.selectSalesStatusCount(salesStatus);
+	if (ordersStatus != null && !ordersStatus.isEmpty()) {
+		AdminSalesManagementDAO asmDAO = AdminSalesManagementDAO.getInstance();
+		cnt = asmDAO.selectOrdersStatusCount(ordersStatus);
 
 	} else {
 		// salesStatus가 제공되지 않을 경우 예외 처리
-		throw new IllegalArgumentException("salesStatus parameter is required.");
+		throw new IllegalArgumentException("ordersStatus parameter is required.");
 	}
 } catch (Exception e) {
 	e.printStackTrace();

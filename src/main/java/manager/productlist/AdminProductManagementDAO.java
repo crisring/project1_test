@@ -189,7 +189,7 @@ public class AdminProductManagementDAO {
 			StringBuilder selectByProductId = new StringBuilder();
 
 			selectByProductId.append(
-					"	select PRODUCT_ID, NAME, MODEL_NAME, BRAND, SALES_STATUS, STOCK_QUANTITY, PRICE, DISCOUNT_PRICE, CREATED_AT, FINISH_AT, main_img, DESCRIPTION	 	")
+					"	select PRODUCT_ID, NAME, MODEL_NAME, BRAND, SALES_STATUS, STOCK_QUANTITY, PRICE, DISCOUNT_PRICE, CREATED_AT, FINISH_AT, main_img, DESCRIPTION,DISCOUNT_FLAG 	 	")
 					.append("	from PRODUCTS	").append("		where PRODUCT_ID =?		");
 			pstmt = con.prepareStatement(selectByProductId.toString());
 
@@ -212,6 +212,7 @@ public class AdminProductManagementDAO {
 				pVO.setFinishAt(rs.getDate("FINISH_AT"));
 				pVO.setDescription(rs.getString("DESCRIPTION"));
 				pVO.setMainImg((rs.getString("main_img")));
+				pVO.setDiscountFlag(rs.getString("DISCOUNT_FLAG"));
 			}
 
 		} finally {
@@ -294,10 +295,10 @@ public class AdminProductManagementDAO {
 			// connection얻기
 			con = dbCon.getConn();
 			// 쿼리문 생성객체 얻기
-			StringBuilder deleteBoard = new StringBuilder();
-			deleteBoard.append("	delete from PRODUCTS	").append("		where PRODUCT_ID =?		");
+			StringBuilder deleteProduct = new StringBuilder();
+			deleteProduct.append("	delete from PRODUCTS	").append("		where PRODUCT_ID =?		");
 
-			pstmt = con.prepareStatement(deleteBoard.toString());
+			pstmt = con.prepareStatement(deleteProduct.toString());
 
 			// productIds 배열의 각 항목에 대해 반복하여 업데이트
 			for (int productId : productIds) {
@@ -316,6 +317,13 @@ public class AdminProductManagementDAO {
 
 	}// deleteProduct
 
+	/**
+	 * 리스트 검색
+	 * 
+	 * @param sVO
+	 * @return
+	 * @throws SQLException
+	 */
 	public List<ProductVO> selectBoard(manager.util.SearchVO sVO) throws SQLException {
 		List<ProductVO> list = new ArrayList<>();
 
@@ -733,5 +741,151 @@ public class AdminProductManagementDAO {
 		} // end finally
 
 	} // insertSubImg
+
+	/**
+	 * 서브 이미지 다시 추가를 위한 데이터 삭제
+	 * 
+	 * @return 삭제된 행 수
+	 * @throws SQLException
+	 */
+	public int deleteSubimg(int productId) throws SQLException {
+
+		int rowCnt = 0;
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+
+		DbConnection dbCon = DbConnection.getInstance();
+
+		try {
+			// connection 얻기
+			con = dbCon.getConn();
+
+			String updateSubimg = "DELETE FROM SUB_IMG WHERE PRODUCT_ID=?";
+
+			pstmt = con.prepareStatement(updateSubimg);
+			pstmt.setInt(1, productId);
+
+			// 쿼리 실행
+			rowCnt = pstmt.executeUpdate();
+		} finally {
+			dbCon.dbClose(null, pstmt, con);
+		}
+
+		return rowCnt;
+	} // deleteSubimg
+
+	/**
+	 * 상품 목록 업데이트
+	 * 
+	 * @param product
+	 */
+	public void updateProduct(String name, int price, int discountPrice, String discountFlag, String description,
+			String mainImg, String brand, String modelName, int stockQuantity, int productId) {
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		DbConnection dbCon = DbConnection.getInstance();
+
+		try {
+			// connection 얻기
+			con = dbCon.getConn();
+			// 쿼리문 생성객체 얻기
+			StringBuilder updateQuery = new StringBuilder();
+			updateQuery.append(
+					"UPDATE PRODUCTS SET NAME = ?, PRICE = ?, DISCOUNT_PRICE = ?, DISCOUNT_FLAG = ?, DESCRIPTION = ?, MAIN_IMG = ?, BRAND = ?, MODEL_NAME = ?, STOCK_QUANTITY = ? ")
+					.append("WHERE PRODUCT_ID = ?");
+
+			pstmt = con.prepareStatement(updateQuery.toString());
+			// 바인드 변수에 값 설정
+			pstmt.setString(1, name);
+			pstmt.setInt(2, price);
+			pstmt.setInt(3, discountPrice);
+			pstmt.setString(4, discountFlag);
+			pstmt.setString(5, description);
+			pstmt.setString(6, mainImg);
+			pstmt.setString(7, brand);
+			pstmt.setString(8, modelName);
+			pstmt.setInt(9, stockQuantity);
+			pstmt.setInt(10, productId);
+
+			// 쿼리문 수행 후 결과 얻기
+			pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dbCon.dbClose(null, pstmt, con);
+		} // end finally
+	} // updateProduct
+
+	/**
+	 * // 상품에 선택된 사이즈들을 DB에서 가져온다.
+	 * 
+	 * @param productId
+	 * @return
+	 */
+	public List<Integer> selectSelectedSizes(int productId) {
+
+		List<Integer> selectedSizes = new ArrayList<>();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		DbConnection dbCon = DbConnection.getInstance();
+
+		try {
+			con = dbCon.getConn();
+			String query = "SELECT CHOOSE_SIZE_ID FROM SIZES WHERE PRODUCT_ID = ?";
+			pstmt = con.prepareStatement(query);
+			pstmt.setInt(1, productId);
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				selectedSizes.add(rs.getInt("CHOOSE_SIZE_ID"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dbCon.dbClose(rs, pstmt, con);
+		}
+
+		return selectedSizes;
+	}// selectSelectedSizes
+
+	/**
+	 * 상품 사이즈 삭제 후 다시 추가
+	 * 
+	 * @param productId
+	 * @return
+	 * @throws SQLException
+	 */
+	public int deleteSizes(int productId) throws SQLException {
+
+		int rowCnt = 0;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+
+		DbConnection dbCon = DbConnection.getInstance();
+
+		try {
+			// connection 얻기
+			con = dbCon.getConn();
+			// 쿼리문 생성
+			String deleteSizes = "DELETE FROM SIZES WHERE PRODUCT_ID = ?";
+
+			pstmt = con.prepareStatement(deleteSizes);
+			// 바인드 변수에 값 설정
+			pstmt.setInt(1, productId);
+
+			// 쿼리문 수행 후 결과 얻기
+			rowCnt = pstmt.executeUpdate();
+
+		} finally {
+			dbCon.dbClose(null, pstmt, con);
+		}
+
+		return rowCnt;
+	}
 
 }

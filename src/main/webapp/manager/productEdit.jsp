@@ -1,7 +1,14 @@
+<%@page import="java.util.List"%>
 <%@page import="manager.productlist.ProductVO"%>
 <%@page import="manager.productlist.AdminProductManagementDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" info="상품 리스트"%>
+
+<%
+// 이동한 페이지에서 새로 고침 했을 때 작업이 여러번 발생하지 않도록 하기위한 flag값 저장
+session.setAttribute("uploadFlag", false);
+%>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -22,13 +29,13 @@
 
 <!-- 내가 쓴거 -->
 <link rel="shortcut icon"
-	href="http://192.168.10.219/project1/common/images/favicon.ico" />
+	href="http://localhost/project1/common/images/favicon.ico" />
 <link rel="stylesheet" type="text/css"
-	href="http://192.168.10.219/project1/common/css/main_20240911.css">
+	href="http://localhost/project1/common/css/main_20240911.css">
 <link rel="stylesheet" type="text/css"
-	href="http://192.168.10.219/project1/common/css/main_Sidbar.css">
+	href="http://localhost/project1/common/css/main_Sidbar.css">
 <link rel="stylesheet"
-	href="http://192.168.10.219/project1/common/css/footer.css">
+	href="http://localhost/project1/common/css/footer.css">
 
 
 <!-- jQuery CDN -->
@@ -62,7 +69,7 @@ button {
 
 /* Product Name Input */
 #productName {
-	width: 1100px;
+	width: 1000px;
 }
 
 /* Sale Price Section */
@@ -120,22 +127,31 @@ button {
 }
 
 .size-box {
-	flex: 0 0 200px;
-	padding: 10px;
-	border: 1px solid #ddd;
-	border-radius: 5px;
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border: 1px solid #ccc;
+	box-sizing: border-box;
 }
 
-.size-box ul {
-	list-style-type: none;
+#selected-sizes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
 	padding: 0;
+	list-style: none;
 }
 
-.size-box ul li {
-	background-color: #f9f9f9;
+.size-item {
+	width: 23%;
 	padding: 5px;
-	margin: 5px 0;
-	border-radius: 3px;
+	border: 1px solid #ccc;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+.size-item:nth-child(4n) {
+	margin-right: 0;
 }
 
 /* Image Container */
@@ -201,7 +217,7 @@ button.button-add-size {
 	min-width: 80px;
 }
 
-#reset-btn, #search-btn {
+#btnReset, #btnSubmit {
 	padding: 10px 20px;
 	border-radius: 4px;
 	border: none;
@@ -214,12 +230,20 @@ button.button-add-size {
 	color: white;
 }
 
+button.button-select-all {
+	margin-top: 10px;
+	font-size: 13px;
+	background-color: #ddd;
+	border: none;
+	border-radius: 5px;
+}
+
 #reset-btn {
 	color: white;
 	margin-right: 10px;
 }
 
-#search-btn {
+#btnSubmit {
 	background-color: #48c774;
 	color: white;
 }
@@ -233,45 +257,38 @@ button.button-add-size {
 	margin-top: 15px;
 }
 </style>
-<!-- 버튼 클릭 설정 -->
-<script type="text/javascript">
-	$(function() {
-		/* 상태 아이콘 변경 */
-		$(".status-item").click(function() {
-			$(this).css("background-color", "#48c774");
-		});
 
-		$('.btn').click(function() {
-			// 다른 버튼의 active 클래스 제거
-			$('.btn').removeClass('active');
+<%
+AdminProductManagementDAO apmDAO = AdminProductManagementDAO.getInstance();
+int productId = Integer.parseInt(request.getParameter("productId"));
 
-			// 클릭한 버튼에 active 클래스 추가
-			$(this).addClass('active');
-		});
+ProductVO pVO = apmDAO.selectByProductId(productId);
+request.setAttribute("pVO", pVO);
+%>
 
-		/* 상품 주요정보-찾기 클릭시 카탈로그 popup */
-		$("#btn-find").click(function() {
-			openCatalog();
-		});
-
-	})// document ready
-
-	/* 카탈로그 찾기 */
-	// 부모창에서 자식창으로 값 전달
-	function openCatalog() {
-		var left = window.screenX + 350;
-		var top = window.screenY + 200;
-
-		// query string 없이 팝업을 띄운다.
-		window.open("catalog.jsp", "descriptionFrm",
-				"width=460,height=380,left=" + left + ",top=" + top);
-	}
-</script>
 
 <!-- 사이즈 -->
 <script type="text/javascript">
+
+$(function() {
+	$('.button-add-size').on('click', function() {
+		addSelectedSizes();
+	});
+	
+
+	$('#selected-sizes').on('click', '.delete-size', function() {
+		$(this).parent().remove();
+	});
+	
+
+	$('.button-select-all').click(function() {
+	    toggleSelectAll();
+	});
+	
+	
+});// ready
+
 	function addSelectedSizes() {
-		// Clear the existing items
 		$('#selected-sizes').empty();
 
 		$('.size-checkboxes input[type="checkbox"]:checked').each(
@@ -283,15 +300,13 @@ button.button-add-size {
 				});
 	}// addSelectedSizes
 
-	$(function() {
-		$('.button-add-size').on('click', function() {
-			addSelectedSizes();
-		});
+	function toggleSelectAll() {
+	    const $checkboxes = $('.size-checkbox');
+	    const allChecked = $checkboxes.filter(':checked').length === $checkboxes.length;
 
-		$('#selected-sizes').on('click', '.delete-size', function() {
-			$(this).parent().remove();
-		});
-	});// ready
+	    $checkboxes.prop('checked', !allChecked);
+	}// toggleSelectAll
+
 </script>
 
 <!-- 글자 수 계산  -->
@@ -308,42 +323,48 @@ button.button-add-size {
 
 <!-- 상품 가격 계산 -->
 <script type="text/javascript">
-	$(function() {
-		// 할인 설정 라디오 버튼 변경 시 할인 입력란 토글
-		$('input[name="sale"]').change(function() {
-			if ($('#sale-on').is(':checked')) {
-				$('#discount-details').show();
-			} else {
-				$('#discount-details').hide();
-				$('#totalprice').text('할인가 0원(0원 할인)');
-			}
-		});
+$(document).ready(function() {
+  // 할인 설정 라디오 버튼 변경 시 이벤트 처리
+  $('input[name="sale"]').change(function() {
+    if ($('#sale-on').is(':checked')) {
+      $('#discount-details').show(); // 할인 입력란 표시
+      updateTotalPrice();
+    } else {
+      $('#discount-details').hide();
+      $('#totalprice').text('할인가: 0원 (할인 없음)');
+    }
+  });
 
-		// 판매가 및 할인 금액 입력 시 계산
-		$('#selling-price, #discount-amount')
-				.on(
-						'input',
-						function() {
-							const sellingPrice = parseFloat($('#selling-price')
-									.val());
-							const discountAmount = parseFloat($(
-									'#discount-amount').val()) || 0;
+  // 판매가나 할인 금액이 변경될 때 실시간으로 할인된 가격 업데이트
+  $('#selling-price, #discount-amount').on('input', function() {
+    updateTotalPrice();
+  });
+});
 
-							if (!isNaN(sellingPrice)) {
-								const discountedPrice = Math.max(sellingPrice
-										- discountAmount, 0);
-								const discountText = sellingPrice > discountAmount ? `${discountAmount}원 할인`
-										: '할인 금액이 판매가보다 큽니다.';
+//할인된 가격을 계산하고 표시하는 함수
+function updateTotalPrice() {
+  const sellingPrice = parseFloat($('#selling-price').val()) || 0; // 판매가
+  const discountAmount = parseFloat($('#discount-amount').val()) || 0; // 할인 금액
 
-								$('#totalprice')
-										.text(
-												`할인가 ${discountedPrice}원(${discountText})`);
-							} else {
-								$('#totalprice').text('할인가 0원(0원 할인)');
-							}
-						});
-	});// ready
+  let discountedPrice = sellingPrice;
+
+  // 할인 적용 시 유효성 검사
+  if ($('#sale-on').is(':checked')) {
+    if (sellingPrice <= 0 || discountAmount < 0 || isNaN(sellingPrice) || isNaN(discountAmount) || discountAmount >= sellingPrice) {
+      $('#totalprice').text('유효한 판매가와 할인 금액을 입력해 주세요.');
+      return;
+    }
+
+    // 할인 적용하여 최종 가격 계산
+    discountedPrice = sellingPrice - discountAmount;
+  }
+
+  // 최종 가격 표시(반올림)
+  $('#totalprice').text('할인가: ' + Math.round(discountedPrice) + '원 (' + Math.round(discountAmount) + '원 할인)');
+
+}
 </script>
+
 
 
 <!-- img container -->
@@ -351,17 +372,31 @@ button.button-add-size {
 	$(function() {
 		//대표 이미지 미리보기
 		$('#mainImage').change(function(event) {
-			const file = event.target.files[0]; // 파일 가져오기
-			const reader = new FileReader(); // FileReader 객체 생성
+    const file = event.target.files[0]; // 파일 가져오기
+    const reader = new FileReader(); // FileReader 객체 생성
 
-			reader.onload = function(e) {
-				$('#mainImagePreview').attr('src', e.target.result).show(); // 미리보기 이미지 설정 및 보이게 하기
-			}
+    reader.onload = function(e) {
+        $('#mainImagePreview')
+            .attr('src', e.target.result)
+            .css('display', 'block'); // 미리보기 이미지 설정 및 보이게 하기
+    }
 
-			if (file) {
-				reader.readAsDataURL(file); // 파일을 Data URL로 읽기
-			}
-		});
+    if (file) {
+        reader.readAsDataURL(file); // 파일을 Data URL로 읽기
+    } else {
+        // 파일 선택이 취소된 경우
+        const originalImage = '<%=pVO.getMainImg() != null ? "images/" + pVO.getMainImg() : ""%>';
+        if (originalImage) {
+            $('#mainImagePreview')
+                .attr('src', originalImage)
+                .css('display', 'block');
+        } else {
+            $('#mainImagePreview')
+                .attr('src', '')
+                .css('display', 'none');
+        }
+    }
+});
 
 		// 추가 이미지 미리보기
 		$('#additionalImages').change(
@@ -370,7 +405,13 @@ button.button-add-size {
 					const previewContainer = $('#additionalImagePreviews');
 					previewContainer.empty(); // 이전 미리보기 이미지 지우기
 
-					for (let i = 0; i < files.length && i < 5; i++) { // 최대 5개까지 처리
+					// 선택된 파일 개수 검사
+					if (files.length > 5) {
+						alert("추가 이미지는 최대 5개까지 선택할 수 있습니다.");
+						return;
+					}
+
+					for (let i = 0; i < files.length; i++) { // 최대 5개까지 처리
 						const file = files[i];
 						const reader = new FileReader(); // FileReader 객체 생성
 
@@ -385,29 +426,222 @@ button.button-add-size {
 						}
 					}
 				});
+
 	});
+</script>
+
+<!-- 상품등록  -->
+<script type="text/javascript">
+	$(function() {
+
+		let isSaving = false;
+		
+		$(window).on("beforeunload", function() {
+		    if (!isSaving) {
+		        return "페이지를 벗어나시겠습니까?";
+		    }
+		});
+		
+		$("#btnSubmit").click(function() {
+			isSaving = true;
+			
+			if(chkNull()){
+				uploadImg();
+				updateData();
+			}
+			
+		})// click
+		
+		$('#btnReset').click(function(){
+				history.back();
+		})// click
+
+	})
+
+function chkNull() {
+    // 필수 항목들을 jQuery를 이용해 선택
+    var productName = $("#productName").val().trim();
+    var sellingPrice = $("#selling-price").val().trim();
+    var brandSelect = $("#brand-select").val();
+    var modelName = $("#model_name").val().trim();
+    var mainImage = $("#mainImage").val();
+    var detailDescription = $("textarea").val().trim();
+    var stockQuantity = $("#stockQuantity").val().trim();
+
+    // 사이즈 체크박스 선택 여부 확인
+    var sizeChecked = $("input[type='checkbox']:checked").length > 0;
+
+    // 라디오 버튼 선택 여부 확인
+    var saleSelected = $("input[name='sale']:checked").val();
+
+    // 필수 항목 검증
+    if (productName === "") {
+        alert("상품명을 입력해 주세요.");
+        $("#productName").focus();
+        return false;
+    }
+    if (sellingPrice === "" || isNaN(sellingPrice) || Number(sellingPrice) <= 0) {
+        alert("판매 가격을 올바르게 입력해 주세요.");
+        $("#selling-price").focus();
+        return false;
+    }
+    if (brandSelect === "" || brandSelect === null) {
+        alert("브랜드를 선택해 주세요.");
+        $("#brand-select").focus();
+        return false;
+    }
+    if (modelName === "") {
+        alert("모델명을 입력해 주세요.");
+        $("#model_name").focus();
+        return false;
+    }
+    if (mainImage === "") {
+        alert("대표 이미지를 선택해 주세요.");
+        $("#mainImage").focus();
+        return false;
+    }
+    if (!sizeChecked) {
+        alert("사이즈를 하나 이상 선택해 주세요.");
+        return false;
+    }
+    if (detailDescription === "") {
+        alert("상세 설명을 입력해 주세요.");
+        $("textarea").focus();
+        return false;
+    }
+
+ // 할인가 요구 사항 추가
+    if (saleSelected === "Y") {
+        var discountAmount = $("#discount-amount").val().trim();
+
+        // 할인 금액이 null이거나 비어있는지 확인
+        if (discountAmount === "") {
+            alert("할인 금액을 입력해 주세요.");
+            $("#discount-amount").focus();
+            return false;
+        }
+
+        // 할인 금액이 0보다 작은지 확인
+        if (isNaN(discountAmount) || Number(discountAmount) <= 0) {
+            alert("할인 금액은 0보다 작을 수 없습니다.");
+            $("#discount-amount").focus();
+            return false;
+        }
+    }
+
+
+    // 재고 수량 추가 검증
+    if (stockQuantity === "" || isNaN(stockQuantity) || Number(stockQuantity) < 0) {
+    	$('#stockError').show();
+        $("#stockQuantity").focus();
+        return false;
+    }
+
+    return true;
+}// chkNull
+
+
+	function updateData() {
+	    var productName = $("#productName").val();
+	    var sellingPrice = parseFloat($("#selling-price").val().trim());
+	    var brandSelect = $("#brand-select").val();
+	    var modelName = $("#model_name").val().trim().toUpperCase();
+	    var detailDescription = $("textarea").val().trim();
+	    var discountAmount = parseFloat($("#discount-amount").val().trim()) || 0; // 할인 금액, 없으면 0
+	    var discountPrice = 0;
+	    var mainImgName = $("#mainImage")[0].files[0].name;
+	    var stockQuantity = $("#stockQuantity").val().trim();
+	    var additionalImgName = Array.from($("#additionalImages")[0].files).map(file => file.name);
+	    
+	    var productId = $('#productId').val();
+	    
+	    // 라디오 버튼 선택 여부 확인
+	    var saleSelected = $("input[name='sale']:checked").val();
+
+	    // 할인 적용
+	    if (saleSelected === 'Y') {
+	        discountPrice = sellingPrice - discountAmount; // 할인 적용
+	    } else {
+	        discountAmount = 0; // 할인 선택 안 하면 할인 금액 0
+	    }
+	    
+	    // 선택한 사이즈
+	    var selectedSizes = [];
+		$("input[type='checkbox']:checked").each(function() {
+			selectedSizes.push($(this).val());
+		});
+	    
+	 // AJAX 요청 전송
+	    $.ajax({
+	        url: "updateData.jsp",
+	        type: "POST",
+	        data: {
+	            productName: productName,
+	            sellingPrice: sellingPrice,
+	            brandSelect: brandSelect,
+	            modelName: modelName,
+	            detailDescription: detailDescription,
+	            discountAmount: discountAmount,
+	            discountPrice: discountPrice,
+	            saleSelected: saleSelected,
+	            mainImgName: mainImgName,
+	            stockQuantity: stockQuantity,
+	            selectedSizes: selectedSizes.join(","),
+	            additionalImgName: additionalImgName.join(","),
+	            productId : productId
+	        },
+	        success: function(response) {
+	            if (response.includes("제품이 성공적으로 변경되었습니다.")) {
+	                alert(response);
+	                location.href = "productList.jsp";
+	            } else {
+	                alert(response);
+	            }
+	        },
+	        error: function(xhr) {
+	            alert("데이터 변경 중 오류가 발생했습니다: " + xhr.statusText);
+	        }
+	    }); // ajax
+
+	} // insertData
+	
+	function uploadImg(){
+
+		// 업로드 가능 확장자는 이미지 관련 확장자만 가능하도록 유효성 검증을 해야한다.
+		// jpg, gif, png, bmp 확장자만 업로드 가능
+		// 위의 확장자가 아니면 alert("업로드 가능 확장자가 아닙니다.")를 보여주고 return
+		allowedExtensions = /(\.jpg|\.jpeg|\.gif|\.png|\.bmp)$/i;
+		var mainImage = $("#mainImage").val();
+		
+		var additionalImgName = Array.from($("#additionalImages")[0].files).map(file => file.name);
+
+		if (!allowedExtensions.exec(mainImage)) {
+			alert("업로드 가능 확장자가 아닙니다.");
+			return;
+		}
+		$("#frm").submit();
+	}
+	
+
+
 </script>
 
 </head>
 <body>
 
-	<jsp:include page="sidebar.jsp"></jsp:include>
+	<jsp:include page="sidebar.jsp" />
 
-	<%
-	AdminProductManagementDAO apmDAO = AdminProductManagementDAO.getInstance();
-	int productId = Integer.parseInt(request.getParameter("productId"));
-
-	ProductVO pVO = apmDAO.selectByProductId(productId);
-	request.setAttribute("pVO", pVO);
-	%>
 
 
 
 	<div id="wrap">
 		<!--  메인 콘텐츠	-->
 		<div class="main-content">
+			<input type="hidden" id="productId" name="productId"
+				value="<%=pVO.getProductId()%>" />
+
 			<div class="content-box" id="sub-title">
-				<h4>상품 수정</h4>
+				<h4>상품 등록</h4>
 				<span class="essential">*필수항목</span>
 			</div>
 
@@ -415,9 +649,9 @@ button.button-add-size {
 				<strong>상품명 <span class="essential">*</span></strong>
 				<div>
 					<input type="text" id="productName" class="productName"
-						maxlength="99" value="<%=pVO.getProductName()%>"> <input
+						maxlength="100" value="<%=pVO.getProductName()%>"> <input
 						type="text" id="charCount" value="0/100" disabled="disabled"
-						style="min-width: 30px">
+						style="width: 55px">
 				</div>
 			</div>
 
@@ -437,24 +671,40 @@ button.button-add-size {
 					<strong>즉시할인</strong>
 					<div class="radio-buttons">
 						<label for="sale-on"> <input type="radio" id="sale-on"
-							class="onoff" value="설정함" name="sale"> 설정함
+							class="onoff" value="Y" name="sale"
+							<%="Y".equals(pVO.getDiscountFlag()) ? "checked" : ""%>>
+							설정함
 						</label> <label for="sale-off"> <input type="radio" id="sale-off"
-							class="onoff" value="설정안함" name="sale"> 설정안함
+							class="onoff" value="N" name="sale"
+							<%="N".equals(pVO.getDiscountFlag()) ? "checked" : ""%>>
+							설정안함
 						</label>
 					</div>
-
 					<div class="discount-details" id="discount-details"
-						style="display: none;">
+						style="<%="Y".equals(pVO.getDiscountFlag()) ? "display: block;" : "display: none;"%>">
 						<p>기본할인 판매가에서 즉시 할인이 가능한 할인 유형으로 할인된 가격으로 상품을 판매할 수 있습니다.</p>
 						<div class="discount-input">
-							<input type="number" id="discount-amount" placeholder="판매가에서">
-							<input type="text" value="원" disabled="disabled"> <span>할인</span>
+							<input type="number" id="discount-amount" placeholder="판매가에서"
+								value="<%=pVO.getPrice() - pVO.getDiscount_price()%>"> <input
+								type="text" value="원" disabled="disabled" style="width: 30px">
+							<span>할인</span>
 						</div>
 						<div id="totalprice">할인가 0원(0원 할인)</div>
 					</div>
 				</div>
+
 			</div>
 
+			<div class="content-box" id="saleprice-container">
+				<strong>재고수량 <span class="essential">*</span></strong>
+				<div>
+					<input type="number" id="stockQuantity" class="productName"
+						placeholder="재고 수량을 입력하세요" min="0" required
+						value="<%=pVO.getStockQuantity()%>">
+				</div>
+				<div id="stockError" style="color: red; display: none;">재고 수량은
+					0 이상이어야 합니다.</div>
+			</div>
 
 
 			<div class="content-box" id="size-container">
@@ -467,11 +717,26 @@ button.button-add-size {
 
 						<div class="size-checkboxes">
 							<%
-							for (int i = 225; i <= 300; i += 5) {
-								out.print("<label><input type=\"checkbox\" value=\"" + i + "\"> " + i + "</label>");
+							List<ProductVO> standardSizeList = apmDAO.selectStandardSize();
+
+							// 이미 선택된 사이즈 목록을 가져옴 (DB에서 불러온 선택된 사이즈)
+							List<Integer> selectedSizes = apmDAO.selectSelectedSizes(productId); // productId에 해당하는 선택된 사이즈들
+
+							if (standardSizeList != null) {
+								for (ProductVO temp : standardSizeList) {
+									int[] standardSizes = temp.getStandardSize(); // 배열을 가져옴
+									if (standardSizes != null) {
+								for (int size : standardSizes) {
+									// 선택된 사이즈에 포함된 경우 'checked' 속성 추가
+									boolean isChecked = selectedSizes.contains(size);
+									out.print("<label><input type=\"checkbox\" class=\"size-checkbox\" value=\"" + size + "\" "
+											+ (isChecked ? "checked" : "") + "> " + size + "</label>");
+								}
+									}
+								}
 							}
 							%>
-
+							<button class="button-select-all">전체 선택/해제</button>
 							<button class="button-add-size">추가</button>
 						</div>
 
@@ -481,61 +746,61 @@ button.button-add-size {
 						</div>
 					</div>
 				</div>
-
 			</div>
 
+
 			<!-- 상품 이미지 -->
+
 			<div class="content-box" id="image-container">
-				<strong>상품 이미지</strong>
-				<div>
-					<strong>대표이미지 <span class="essential">*</span></strong> <input
-						type="file" id="mainImage" accept="image/*"> <strong>추가이미지
-						(최대 5개)</strong> <input type="file" id="additionalImages" accept="image/*"
-						multiple>
-				</div>
 
-				<!-- 미리보기 영역 -->
-				<div class="preview-container">
-					<strong>미리보기</strong>
+				<form action="upload_process.jsp" method="post"
+					enctype="multipart/form-data" id="frm" name="frm">
+
+
+					<strong>상품 이미지</strong>
 					<div>
-						<img id="mainImagePreview" src="" alt="대표이미지 미리보기"
-							style="display: none;">
-						<div id="additionalImagePreviews"
-							style="display: flex; flex-wrap: wrap;"></div>
+						<strong>대표이미지 <span class="essential">*</span></strong> <input
+							type="file" id="mainImage" name="mainImage" accept="image/*">
+						<strong>추가이미지 (최대 5개)</strong> <input type="file"
+							id="additionalImages" accept="image/*" multiple>
 					</div>
-				</div>
 
-
-				<div>
+					<!-- 미리보기 영역 -->
+					<div class="preview-container">
+						<strong>미리보기</strong>
+						<div>
+							<!-- 초기 이미지 표시 또는 새로운 이미지 미리보기 -->
+							<img id="mainImagePreview"
+								src='<%=pVO.getMainImg() != null ? "images/" + pVO.getMainImg() : ""%>'
+								alt="대표이미지 미리보기"
+								style='<%=pVO.getMainImg() != null ? "display: block" : "display: none"%>'>
+							<div id="additionalImagePreviews"
+								style="display: flex; flex-wrap: wrap;"></div>
+						</div>
+					</div>
 					<strong>상세설명 <span class="essential">*</span></strong>
 					<textarea rows="4" cols="50"><%=pVO.getDescription()%></textarea>
 
-				</div>
+				</form>
 			</div>
 
 
 			<div class="content-box" id="size-container">
 				<strong>상품 주요정보 <span class="essential">*</span></strong>
 
-				<div class="form-group">
-					<strong>카탈로그</strong> <input type="text" id="catalog"
-						placeholder="카탈로그를 입력하세요"> <input type="button" value="찾기"
-						id="btn-find">
-				</div>
 
 				<div class="form-group">
 					<strong>브랜드</strong> <select id="brand-select" name="brand">
 						<option value="">브랜드명을 입력해주세요</option>
-						<option value="나이키"
-							<%="나이키".equals(pVO.getBrand()) ? "selected" : ""%>>나이키</option>
-						<option value="아디다스"
-							<%="아디다스".equals(pVO.getBrand()) ? "selected" : ""%>>아디다스</option>
-						<option value="뉴발란스"
-							<%="뉴발란스".equals(pVO.getBrand()) ? "selected" : ""%>>뉴발란스</option>
-						<option value="아식스"
-							<%="아식스".equals(pVO.getBrand()) ? "selected" : ""%>>아식스</option>
+						<option value="NIKE"
+							<%="NIKE".equals(pVO.getBrand()) ? "selected" : ""%>>나이키</option>
+						<option value="ADIDAS"
+							<%="ADIDAS".equals(pVO.getBrand()) ? "selected" : ""%>>아디다스</option>
+						<option value="NEWBALANCE"
+							<%="NEWBALANCE".equals(pVO.getBrand()) ? "selected" : ""%>>뉴발란스</option>
+						<option value="ASICS"
+							<%="ASICS".equals(pVO.getBrand()) ? "selected" : ""%>>아식스</option>
 					</select>
-
 				</div>
 
 				<div class="form-group">
@@ -546,8 +811,8 @@ button.button-add-size {
 			</div>
 
 			<div class="search-item button-group">
-				<button id="search-btn" class="btn-search">저장하기</button>
-				<input type="reset" id="reset-btn" class="btn-reset" value="초기화">
+				<input type="button" id="btnSubmit" class="btn-save" value="저장하기">
+				<input type="reset" id="btnReset" class="btn-reset" value="이전으로">
 			</div>
 
 

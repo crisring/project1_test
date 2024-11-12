@@ -8,7 +8,7 @@ public class ProductVO {
 	private int productId, catalog, size, price, salePrice, stockQuantity, discount_price;
 	// 상품번호, 카탈로그번호, 선택 사이즈, 가격, 할인가격, 수량, 할인가
 	private int[] subimgId, standardSize; // 서브이미지 ID, 표준 신발 사이즈
-	private String mainImg, description, productName, modelName, brand, saleStatus;
+	private String mainImg, description, productName, modelName, brand, saleStatus, discountFlag;
 	// 메인이미지, 상세설명, 상품명, 모델명, 브랜드명, 판매상태
 
 	private String[] sizes;
@@ -158,14 +158,23 @@ public class ProductVO {
 		this.standardSize = standardSize;
 	}
 
+	public String getDiscountFlag() {
+		return discountFlag;
+	}
+
+	public void setDiscountFlag(String discountFlag) {
+		this.discountFlag = discountFlag;
+	}
+
 	@Override
 	public String toString() {
 		return "ProductVO [productId=" + productId + ", catalog=" + catalog + ", size=" + size + ", price=" + price
 				+ ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity + ", discount_price=" + discount_price
 				+ ", subimgId=" + Arrays.toString(subimgId) + ", standardSize=" + Arrays.toString(standardSize)
 				+ ", mainImg=" + mainImg + ", description=" + description + ", productName=" + productName
-				+ ", modelName=" + modelName + ", brand=" + brand + ", saleStatus=" + saleStatus + ", sizes="
-				+ Arrays.toString(sizes) + ", createAt=" + createAt + ", finishAt=" + finishAt + "]";
+				+ ", modelName=" + modelName + ", brand=" + brand + ", saleStatus=" + saleStatus + ", discountFlag="
+				+ discountFlag + ", sizes=" + Arrays.toString(sizes) + ", createAt=" + createAt + ", finishAt="
+				+ finishAt + "]";
 	}
 
 }

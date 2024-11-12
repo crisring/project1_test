@@ -3,6 +3,12 @@
 <%@page import="manager.productlist.AdminProductManagementDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" info="상품 리스트"%>
+
+<%
+// 이동한 페이지에서 새로 고침 했을 때 작업이 여러번 발생하지 않도록 하기위한 flag값 저장
+session.setAttribute("uploadFlag", false);
+%>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -211,7 +217,7 @@ button.button-add-size {
 	min-width: 80px;
 }
 
-#reset-btn, #btnSubmit {
+#btnReset, #btnSubmit {
 	padding: 10px 20px;
 	border-radius: 4px;
 	border: none;
@@ -251,29 +257,6 @@ button.button-select-all {
 	margin-top: 15px;
 }
 </style>
-<!-- 카탈로그 설정 -->
-<script type="text/javascript">
-	$(function() {
-
-		/* 상품 주요정보-찾기 클릭시 카탈로그 popup */
-		$("#btn-find").click(function() {
-			openCatalog();
-		});
-
-	})// document ready
-
-	/* 카탈로그 찾기 */
-	// 부모창에서 자식창으로 값 전달
-	function openCatalog() {
-		var left = window.screenX + 350;
-		var top = window.screenY + 200;
-
-		// query string 없이 팝업을 띄운다.
-		window.open("catalog.jsp", "descriptionFrm",
-				"width=460,height=380,left=" + left + ",top=" + top);
-	}
-</script>
-
 <!-- 사이즈 -->
 <script type="text/javascript">
 
@@ -330,59 +313,47 @@ $(function() {
 
 <!-- 상품 가격 계산 -->
 <script type="text/javascript">
-	$(function() {
-		// 할인 설정 라디오 버튼 변경 시 할인 입력란 토글
-		$('input[name="sale"]').change(function() {
-			if ($('#sale-on').is(':checked')) {
-				$('#discount-details').show(); // 할인 입력란 표시
-				updateTotalPrice();
-			} else {
-				$('#discount-details').hide();
-				$('#totalprice').text('할인가 0원(0원 할인)');
-			}
-		}); // change
+$(document).ready(function() {
+  // 할인 설정 라디오 버튼 변경 시 이벤트 처리
+  $('input[name="sale"]').change(function() {
+    if ($('#sale-on').is(':checked')) {
+      $('#discount-details').show(); // 할인 입력란 표시
+      updateTotalPrice();
+    } else {
+      $('#discount-details').hide();
+      $('#totalprice').text('할인가: 0원 (할인 없음)');
+    }
+  });
 
-		let debounceTimer;
-		$('#selling-price, #discount-amount').on('input', function() {
-			clearTimeout(debounceTimer);
-			debounceTimer = setTimeout(function() {
-				updateTotalPrice();
-			}, 300);
-		});
-	}); // ready
+  // 판매가나 할인 금액이 변경될 때 실시간으로 할인된 가격 업데이트
+  $('#selling-price, #discount-amount').on('input', function() {
+    updateTotalPrice();
+  });
+});
 
-	// 할인 가격 계산 및 표시 함수
-	function updateTotalPrice() {
-		const sellingPrice = parseFloat($('#selling-price').val()) || 0; // 판매가
-		const discountAmount = parseFloat($('#discount-amount').val()) || 0; // 할인 금액
+//할인된 가격을 계산하고 표시하는 함수
+function updateTotalPrice() {
+  const sellingPrice = parseFloat($('#selling-price').val()) || 0; // 판매가
+  const discountAmount = parseFloat($('#discount-amount').val()) || 0; // 할인 금액
 
-		// 기본적으로 할인 금액이 유효하지 않은 경우 기본 가격 표시
-		let discountedPrice = sellingPrice;
+  let discountedPrice = sellingPrice;
 
-		// 할인 적용 시 유효성 검사
-		if ($('#sale-on').is(':checked')) {
-			if (sellingPrice <= 0 || discountAmount < 0 || isNaN(sellingPrice) || isNaN(discountAmount)) {
-				$('#totalprice').text(`할인가 ${sellingPrice.toFixed(2)}원(올바른 판매가와 할인 금액을 입력해 주세요.)`);
-				return;
-			}
+  // 할인 적용 시 유효성 검사
+  if ($('#sale-on').is(':checked')) {
+    if (sellingPrice <= 0 || discountAmount < 0 || isNaN(sellingPrice) || isNaN(discountAmount) || discountAmount >= sellingPrice) {
+      $('#totalprice').text('유효한 판매가와 할인 금액을 입력해 주세요.');
+      return;
+    }
 
-			// 할인 금액이 판매가보다 크면 할인 금액을 판매가로 설정
-			if (discountAmount >= sellingPrice) {
-				discountedPrice = 0;
-				$('#totalprice').text(`할인가 ${discountedPrice.toFixed(2)}원(전체 할인)`);
-				return;
-			}
+    // 할인 적용하여 최종 가격 계산
+    discountedPrice = sellingPrice - discountAmount;
+  }
 
-			// 할인 적용
-			discountedPrice = sellingPrice - discountAmount;
-		}
+  // 최종 가격 표시(반올림)
+  $('#totalprice').text('할인가: ' + Math.round(discountedPrice) + '원 (' + Math.round(discountAmount) + '원 할인)');
 
-		// 최종 가격 표시
-		$('#totalprice').text(`할인가 ${discountedPrice.toFixed(2)}원(${discountAmount.toFixed(2)}원 할인)`);
-	}
+}
 </script>
-
-
 
 <!-- img container -->
 <script type="text/javascript">
@@ -404,7 +375,7 @@ $(function() {
 		// 추가 이미지 미리보기
 		$('#additionalImages').change(
 				function(event) {
-					const files = event.target.files; // 선택된 파일들 가져오기
+					const files = event.target.files;
 					const previewContainer = $('#additionalImagePreviews');
 					previewContainer.empty(); // 이전 미리보기 이미지 지우기
 
@@ -437,14 +408,51 @@ $(function() {
 <script type="text/javascript">
 	$(function() {
 
+		let isSaving = false;
+		
+		$(window).on("beforeunload", function() {
+		    if (!isSaving) {
+		        return "페이지를 벗어나시겠습니까?";
+		    }
+		});
+		
 		$("#btnSubmit").click(function() {
+			isSaving = true;
+			
 			if(chkNull()){
+				uploadImg();
 				insertData();
 			} 
 		})// click
+		
+		$('#btnReset').click(function() {
+
+			if (confirm("초기화 하시겠습니까?")){
+		    $("#productName").val('');        
+		    $("#selling-price").val('');       
+		    $("#brand-select").val('');         
+		    $("#model_name").val('');           
+		    $("#mainImage").val('');            
+		    $("textarea").val('');             
+		    $("#stockQuantity").val('');        
+		    $("#additionalImages").val('');
+		    
+		 	// 미리보기 이미지 숨기기
+		     $('#mainImagePreview').empty(); 
+		     $('#additionalImagePreviews').empty();
+		     
+		     // 체크박스 초기화
+		     $("input[type='checkbox']").prop('checked', false);
+
+		     // 라디오 버튼 초기화
+		     $("input[name='sale']").prop('checked', false); 
+		     
+			}
+		});
+
 
 	})
-
+	
 function chkNull() {
     // 필수 항목들을 jQuery를 이용해 선택
     var productName = $("#productName").val().trim();
@@ -540,6 +548,7 @@ function chkNull() {
 	    var stockQuantity = $("#stockQuantity").val().trim();
 	    var additionalImgName = Array.from($("#additionalImages")[0].files).map(file => file.name);
 	    
+	    
 	    // 라디오 버튼 선택 여부 확인
 	    var saleSelected = $("input[name='sale']:checked").val();
 
@@ -588,6 +597,22 @@ function chkNull() {
 	    }); // ajax
 
 	} // insertData
+	
+	function uploadImg(){
+
+		// 업로드 가능 확장자는 이미지 관련 확장자만 가능하도록 유효성 검증을 해야한다.
+		// jpg, gif, png, bmp 확장자만 업로드 가능
+		// 위의 확장자가 아니면 alert("업로드 가능 확장자가 아닙니다.")를 보여주고 return
+		allowedExtensions = /(\.jpg|\.jpeg|\.gif|\.png|\.bmp)$/i;
+		var filePath = $("#mainImage").val();
+
+		if (!allowedExtensions.exec(filePath)) {
+			alert("업로드 가능 확장자가 아닙니다.");
+			return;
+		}
+		$("#frm").submit();
+	
+	}
 
 </script>
 
@@ -634,19 +659,19 @@ function chkNull() {
 						</label> <label for="sale-off"> <input type="radio" id="sale-off"
 							class="onoff" value="N" name="sale"> 설정안함
 						</label>
-
 					</div>
 
 					<div class="discount-details" id="discount-details"
 						style="display: none;">
 						<p>기본할인 판매가에서 즉시 할인이 가능한 할인 유형으로 할인된 가격으로 상품을 판매할 수 있습니다.</p>
 						<div class="discount-input">
-							<input type="number" id="discount-amount" placeholder="판매가에서">
-							<input type="text" value="원" disabled="disabled"
-								style="width: 30px"> <span>할인</span>
+							<input type="number" id="discount-amount"
+								placeholder="할인 금액을 입력하세요" min="0" required> <input
+								type="text" value="원" disabled style="width: 30px"> <span>할인</span>
 						</div>
 						<div id="totalprice">할인가 0원(0원 할인)</div>
 					</div>
+
 				</div>
 			</div>
 			<div class="content-box" id="saleprice-container">
@@ -699,51 +724,52 @@ function chkNull() {
 			</div>
 
 			<!-- 상품 이미지 -->
+
 			<div class="content-box" id="image-container">
-				<strong>상품 이미지</strong>
-				<div>
-					<strong>대표이미지 <span class="essential">*</span></strong> <input
-						type="file" id="mainImage" accept="image/*"> <strong>추가이미지
-						(최대 5개)</strong> <input type="file" id="additionalImages" accept="image/*"
-						multiple>
-				</div>
 
-				<!-- 미리보기 영역 -->
-				<div class="preview-container">
-					<strong>미리보기</strong>
+				<form action="upload_process.jsp" method="post"
+					enctype="multipart/form-data" id="frm" name="frm">
+					<strong>상품 이미지</strong>
 					<div>
-						<img id="mainImagePreview" src="" alt="대표이미지 미리보기"
-							style="display: none;">
-						<div id="additionalImagePreviews"
-							style="display: flex; flex-wrap: wrap;"></div>
+						<strong>대표이미지 <span class="essential">*</span></strong> <input
+							type="file" id="mainImage" name="mainImage" accept="image/*">
+						<strong>추가이미지 (최대 5개)</strong> <input type="file"
+							id="additionalImages" accept="image/*" multiple>
 					</div>
-				</div>
 
 
-				<div>
-					<strong>상세설명 <span class="essential">*</span></strong>
-					<textarea rows="4" cols="50"></textarea>
-				</div>
+					<!-- 미리보기 영역 -->
+					<div class="preview-container">
+						<strong>미리보기</strong>
+						<div>
+							<img id="mainImagePreview" src="" alt="대표이미지 미리보기"
+								style="display: none;">
+							<div id="additionalImagePreviews"
+								style="display: flex; flex-wrap: wrap;"></div>
+						</div>
+					</div>
+
+
+					<div>
+						<strong>상세설명 <span class="essential">*</span></strong>
+						<textarea rows="4" cols="50"></textarea>
+					</div>
+
+				</form>
 			</div>
 
 
 			<div class="content-box" id="size-container">
 				<strong>상품 주요정보 <span class="essential">*</span></strong>
-
-				<div class="form-group">
-					<strong>카탈로그</strong> <input type="button" value="찾기" id="btn-find">
-				</div>
-
 				<div class="form-group">
 					<strong>브랜드</strong> <select id="brand-select">
 						<option value="">브랜드명을 입력해주세요</option>
-						<option value="나이키">나이키</option>
-						<option value="아디다스">아디다스</option>
-						<option value="뉴발란스">뉴발란스</option>
-						<option value="아식스">아식스</option>
+						<option value="NIKE">나이키</option>
+						<option value="ADIDAS">아디다스</option>
+						<option value="NEWBALANCE">뉴발란스</option>
+						<option value="ASICS">아식스</option>
 					</select>
 				</div>
-
 				<div class="form-group">
 					<strong>모델명</strong> <input type="text" id="model_name"
 						class="text" placeholder="모델명을 입력하세요">
@@ -752,7 +778,7 @@ function chkNull() {
 
 			<div class="search-item button-group">
 				<input type="button" id="btnSubmit" class="btn-save" value="저장하기">
-				<input type="reset" id="reset-btn" class="btn-reset" value="초기화">
+				<input type="reset" id="btnReset" class="btn-reset" value="초기화">
 			</div>
 
 

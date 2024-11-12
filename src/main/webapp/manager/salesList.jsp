@@ -78,7 +78,7 @@
 	content: "\f07a";
 }
 
-.icon.sale-paused::before {
+.icon.sale-completed::before {
 	content: "\f07a";
 }
 
@@ -301,14 +301,14 @@ table {
 	$(function() {
 
 		// 카운트 업데이트
-		$('#all .count').text(totalSalesStatusCnt() + ' 건');
-		$('#on-sale .count').text(getSalesCount("판매중") + ' 건');
-		$('#sale-paused .count').text(getSalesCount("판매중지") + ' 건');
-		$('#sale-ended .count').text(getSalesCount("판매종료") + ' 건');
+		$('#all .count').text(totalOrdersStatusCnt() + ' 건');
+		$('#on-sale .count').text(getOrdersCount("구매확정") + ' 건');
+		$('#sale-completed .count').text(getOrdersCount("결제완료") + ' 건');
+		$('#sale-ended .count').text(getOrdersCount("취소요청") + ' 건');
 
 	})// ready
 
-	function totalSalesStatusCnt() {
+	function totalOrdersStatusCnt() {
 		var cnt = 0;
 
 		// AJAX 요청을 통해 판매 수량을 가져옵니다.
@@ -326,9 +326,9 @@ table {
 		});
 
 		return cnt;
-	}
+	}// totalOrdersStatusCnt
 
-	function getSalesCount(salesStatus) {
+	function getOrdersCount(ordersStatus) {
 		var cnt = 0;
 
 		// AJAX 요청을 통해 판매 수량을 가져옵니다.
@@ -336,7 +336,7 @@ table {
 			url : "ordersCnt.jsp",
 			type : "get",
 			data : {
-				salesStatus : salesStatus
+				ordersStatus : ordersStatus
 			// 선택된 상태만 전달
 			},
 			async : false,
@@ -350,7 +350,7 @@ table {
 		});
 
 		return cnt;
-	}// getSalesCount
+	}// getOrdersCount
 </script>
 
 <!-- 배송+주문 상태 변경  -->
@@ -412,7 +412,7 @@ table {
 	$(function() {
 
 		$("#deleteBtn").click(function() {
-
+			alert("hi");
 			deleteData();
 
 		})// click
@@ -500,6 +500,20 @@ table {
 	<%
 	AdminSalesManagementDAO asmDAO = AdminSalesManagementDAO.getInstance();
 
+	String orderStatus = request.getParameter("order-status");
+	String startDate = request.getParameter("start-date");
+	String endDate = request.getParameter("end-date");
+
+	if (orderStatus != null && !orderStatus.trim().isEmpty()) {
+		sVO.setOrderStatus(orderStatus);
+	}
+	if (startDate != null && !startDate.trim().isEmpty()) {
+		sVO.setStartDate(startDate);
+	}
+	if (endDate != null && !endDate.trim().isEmpty()) {
+		sVO.setEndDate(endDate);
+	}
+
 	// 총 레코드 수 구하기
 	int totalCount = 0;
 
@@ -558,6 +572,11 @@ table {
 	pageContext.setAttribute("totalPage", totalPage);
 	pageContext.setAttribute("currentPage", currentPage);
 	pageContext.setAttribute("saleslist", listBoard);
+
+	// 검색 조건도 속성으로 설정
+	request.setAttribute("orderStatus", orderStatus);
+	request.setAttribute("startDate", startDate);
+	request.setAttribute("endDate", endDate);
 	%>
 
 
@@ -578,9 +597,9 @@ table {
 				<div class="icon on-sale"></div>
 				<span>구매확정</span> <span class="count">0 건</span>
 			</div>
-			<div class="status-item" id="sale-paused">
-				<div class="icon sale-paused"></div>
-				<span>결제대기</span> <span class="count">0 건</span>
+			<div class="status-item" id="sale-completed">
+				<div class="icon sale-completed"></div>
+				<span>결제완료</span> <span class="count">0 건</span>
 			</div>
 			<div class="status-item" id="sale-ended">
 				<div class="icon sale-ended"></div>
@@ -598,7 +617,7 @@ table {
 						<label>주문상태</label> <label><input type="radio"
 							name="order-status" value="" checked="checked"> 전체</label> <label><input
 							type="radio" name="order-status" value="구매확정"> 구매확정</label> <label><input
-							type="radio" name="order-status" value="구매 미정"> 구매 미정</label> <label><input
+							type="radio" name="order-status" value="결제완료"> 결제완료</label> <label><input
 							type="radio" name="order-status" value="취소요청"> 취소요청</label>
 					</div>
 
@@ -614,15 +633,15 @@ table {
 						<option value="3-months">3개월</option>
 						<option value="6-months">6개월</option>
 						<option value="1-year">1년</option>
-					</select> <input type="date" id="start-date"> <input type="date"
-						id="end-date">
+					</select> <input type="date" id="start-date" name="start-date"> <input
+						type="date" id="end-date" name="end-date">
 				</div>
 
 				<br>
 				<!-- 검색 및 초기화 버튼 -->
 				<div class="search-item button-group">
-					<button id="search-btn" class="btn-search">검색</button>
-					<input type="reset" id="reset-btn" class="btn-reset" value="초기화">
+					<button type="button" id="search-btn" class="btn-search">검색</button>
+					<input type="button" id="reset-btn" class="btn-reset" value="초기화">
 				</div>
 			</form>
 		</div>
@@ -646,7 +665,7 @@ table {
 						aria-label="Default select example">
 						<option value="">주문상태</option>
 						<option value="구매확정">구매확정</option>
-						<option value="결제대기">결제대기</option>
+						<option value="결제완료">결제완료</option>
 						<option value="취소요청">취소요청</option>
 					</select> <select id="sale-type" name="sale-type" class="form-select"
 						aria-label="Default select example">
@@ -668,10 +687,11 @@ table {
 					<tr>
 						<td><input type="checkbox" id="select-all"></td>
 						<td>주문번호</td>
-						<td>상품명</td>
+						<td>주문명</td>
 						<td>주문상태</td>
 						<td>배송상태</td>
 						<td>구매자ID</td>
+						<td>주문날짜</td>
 					</tr>
 				</thead>
 
@@ -680,7 +700,7 @@ table {
 
 					<c:if test="${ empty saleslist }">
 						<tr>
-							<td style="text-align: center" colspan="6">조회 가능한 항목이 없습니다.<br>
+							<td style="text-align: center" colspan="7">조회 가능한 항목이 없습니다.<br>
 							</td>
 						</tr>
 					</c:if>
@@ -695,6 +715,7 @@ table {
 							<td>${item.orderStatus}</td>
 							<td>${item.shippingStatus}</td>
 							<td>${item.userId}</td>
+							<td>${item.orderDate}</td>
 						</tr>
 					</c:forEach>
 				</tbody>
