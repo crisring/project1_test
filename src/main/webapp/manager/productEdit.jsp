@@ -32,11 +32,10 @@ session.setAttribute("uploadFlag", false);
 	href="http://localhost/project1/common/images/favicon.ico" />
 <link rel="stylesheet" type="text/css"
 	href="http://localhost/project1/common/css/main_20240911.css">
-<link rel="stylesheet" type="text/css"
-	href="http://localhost/project1/common/css/main_Sidbar.css">
 <link rel="stylesheet"
 	href="http://localhost/project1/common/css/footer.css">
-
+<link rel="stylesheet" type="text/css"
+	href="http://localhost/project1/common/css/main_Sidbar.css">
 
 <!-- jQuery CDN -->
 <script
@@ -667,7 +666,7 @@ $(document).ready(function() {
 </head>
 <body>
 
-	<jsp:include page="sidebar.jsp" />
+	<jsp:include page="sidebar2.jsp" />
 
 
 

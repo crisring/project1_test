@@ -40,6 +40,8 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
+
+
 <!-- 상태 아이콘 스타일 -->
 <style type="text/css">
 #status-container {
@@ -96,8 +98,7 @@
 	flex-direction: column;
 	gap: 20px;
 	padding: 20px;
-	max-width: 1500px;
-	margin: 0 auto;
+	width: 2000px;
 	border: 1px solid #ddd;
 }
 
@@ -182,6 +183,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	gap: 10px;
 }
 
 .select-delete-btn {
@@ -223,38 +225,6 @@ table {
 	justify-content: center;
 	align-items: center;
 	text-align: center;
-}
-
-/* 데스크탑 화면 (1025px 이상) */
-@media ( min-width : 1025px) {
-	#status-container {
-		flex-direction: row;
-	}
-	.icon {
-		width: 50px;
-		height: 50px;
-		font-size: 24px;
-	}
-	#search-container {
-		padding: 20px;
-	}
-	.btn-search, .btn-reset, .btn-save {
-		padding: 12px 30px;
-		font-size: 16px;
-	}
-	.product-list-actions {
-		flex-direction: row;
-	}
-	.product-count {
-		font-size: 14px;
-	}
-	.action-buttons button {
-		padding: 10px 20px;
-		font-size: 14px;
-	}
-	table {
-		font-size: 13px;
-	}
 }
 </style>
 
@@ -732,8 +702,7 @@ request.setAttribute("sortBy", sortBy);
 <body>
 
 	<!-- 사이드바 포함 -->
-	<jsp:include page="sidebar.jsp"></jsp:include>
-
+	<jsp:include page="sidebar2.jsp"></jsp:include>
 
 
 

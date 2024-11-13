@@ -1,7 +1,7 @@
 <%@page import="manager.saleslist.AdminSalesManagementDAO"%>
 <%@page import="org.json.simple.JSONObject"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8" info=""%>
+	pageEncoding="UTF-8" info="" trimDirectiveWhitespaces="true"%>
 <%
 JSONObject jsonObj = new JSONObject();
 int cnt = 0;
@@ -16,11 +16,11 @@ try {
 
 	} else {
 		// salesStatus가 제공되지 않을 경우 예외 처리
-		throw new IllegalArgumentException("ordersStatus parameter is required.");
+		throw new IllegalArgumentException("ordersStatus 매개 변수가 필요합니다.");
 	}
 } catch (Exception e) {
 	e.printStackTrace();
-	jsonObj.put("error", "An error occurred: " + e.getMessage()); // 오류 메시지를 JSON에 추가
+	jsonObj.put("error", "오류가 발생했습니다: " + e.getMessage()); // 오류 메시지를 JSON에 추가
 }
 
 jsonObj.put("rowCnt", cnt);

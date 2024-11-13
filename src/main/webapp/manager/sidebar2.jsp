@@ -1,5 +1,98 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8" info=""%>
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+
+
+<style>
+/* 좌측 고정 사이드바 */
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 250px;
+	height: 100%;
+	background-color: #414B5A;
+	padding-top: 70px;
+	z-index: 999;
+	color: white;
+	overflow-y: auto;
+}
+
+.sidebar h3 {
+	padding: 15px;
+	text-align: center;
+	background-color: #414B5A;
+}
+
+/* 아코디언 및 사이드바 링크 */
+.sidebar a, .accordion-button {
+	color: white;
+	padding: 10px 20px;
+	text-decoration: none;
+	display: block;
+	background-color: #414B5A;
+	border: 1px solid #354b5e;
+	border-radius: 0;
+}
+
+.sidebar a:hover, .accordion-button:hover {
+	background-color: #354b5e;
+}
+
+/* 아코디언 확장/클릭 시 배경색 유지 */
+.accordion-button:not(.collapsed), .accordion-body {
+	background-color: #414B5A !important;
+	color: white;
+}
+
+.accordion-body a {
+	background-color: #414B5A;
+	color: white;
+}
+
+.accordion-body a:hover {
+	background-color: #354b5e;
+	color: white;
+}
+
+.accordion-body a:focus {
+	color: white;
+	outline: none;
+}
+
+.accordion-body a:active {
+	color: white;
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+	margin-left: 250px;
+	padding: 85px 20px;
+	background-color: #e9ecef;
+	min-height: 100vh;
+	display: flex;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+
+.content-box {
+	background-color: white;
+	width: 2000px;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+/* Adjusted sub-title spacing */
+#sub-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+}
+</style>
+
+
 <!-- 상단 고정 헤더 -->
 <div class="header">
 	<span><a href="main.jsp">스마트스토어 센터</a></span> <span>로그인 상태</span>
@@ -7,7 +100,7 @@
 
 <!-- 좌측 고정 사이드바 -->
 <div class="sidebar">
-	<h3>관리자 명</h3>
+	<h3>${adminData.name}명</h3>
 	<div class="accordion" id="accordionSidebar">
 		<!-- 상품 관리 -->
 		<div class="accordion-item">

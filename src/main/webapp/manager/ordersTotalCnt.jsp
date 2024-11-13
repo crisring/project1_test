@@ -12,7 +12,7 @@ try {
 	cnt = asmDAO.statusTotalCount(); // 판매 상태 수량을 가져옴
 } catch (Exception e) {
 	e.printStackTrace();
-	jsonObj.put("error", "An error occurred: " + e.getMessage());
+	jsonObj.put("error", "오류가 발생했습니다: " + e.getMessage());
 }
 
 jsonObj.put("rowCnt", cnt); // JSON 객체에 rowCnt 속성으로 수량 추가

@@ -94,8 +94,6 @@
 	flex-direction: column;
 	gap: 20px;
 	padding: 20px;
-	max-width: 1500px;
-	margin: 0 auto;
 	border: 1px solid #ddd;
 }
 
@@ -538,7 +536,7 @@ table {
 <body>
 
 	<!-- 사이드바 포함 -->
-	<jsp:include page="sidebar.jsp"></jsp:include>
+	<jsp:include page="sidebar2.jsp"></jsp:include>
 
 	<jsp:useBean id="sVO" class="manager.util.AdminSearchVO" scope="page" />
 	<jsp:setProperty property="*" name="sVO" />
