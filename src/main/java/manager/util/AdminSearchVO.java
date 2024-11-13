@@ -3,7 +3,7 @@ package manager.util;
 /**
  * 현재페이지, 시작번호, 끝 번호, 검색컬럼, 검색값, 검색URL
  */
-public class SearchVO {
+public class AdminSearchVO {
 	private int startNum, endNum, currentPage, totalPage, totalCount, pageScale;
 	// 시작번호, 끝번호, 현재 페이지 번호, 총 페이지 수, 페이지스캐일
 

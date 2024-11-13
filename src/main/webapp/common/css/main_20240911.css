@@ -2,7 +2,7 @@
 
 body {
 	margin: 0px;
-	padding: 0px
+	padding: 0px;
 }
 
 body {
@@ -14,7 +14,7 @@ body {
 a {
 	font-size: 12px;
 	color: #a9a9a9;
-	text-decoration: none
+	text-decoration: none;
 }
 
 a:hover {
@@ -96,4 +96,19 @@ hr {
 	color: #FFFFFF;
 	font-size: 13px;
 	cursor: pointer;
+}
+
+/* 미디어 쿼리 추가 */
+/* 데스크탑 화면 (최소 1025px 이상) */
+@media ( min-width : 1025px) {
+	body {
+		font-size: 12px; /* 기본 폰트 크기 유지 */
+	}
+	.btnMy, .btnMySubmit, .btnMyReset {
+		width: 180px; /* 기본 버튼 너비 유지 */
+		height: 41px;
+	}
+	.inputBox {
+		width: auto; /* 기본 너비 설정 */
+	}
 }

@@ -5,13 +5,13 @@ import java.util.Date;
 
 public class ProductVO {
 
-	private int productId, catalog, size, price, salePrice, stockQuantity, discount_price;
+	private int productId, size, price, salePrice, stockQuantity, discount_price;
 	// 상품번호, 카탈로그번호, 선택 사이즈, 가격, 할인가격, 수량, 할인가
-	private int[] subimgId, standardSize; // 서브이미지 ID, 표준 신발 사이즈
+	private int[] standardSize; // 표준 신발 사이즈
 	private String mainImg, description, productName, modelName, brand, saleStatus, discountFlag;
 	// 메인이미지, 상세설명, 상품명, 모델명, 브랜드명, 판매상태
 
-	private String[] sizes;
+	private String[] sizes; // 사이즈
 	private Date createAt, finishAt;
 
 	public int getProductId() {
@@ -20,14 +20,6 @@ public class ProductVO {
 
 	public void setProductId(int productId) {
 		this.productId = productId;
-	}
-
-	public int getCatalog() {
-		return catalog;
-	}
-
-	public void setCatalog(int catalog) {
-		this.catalog = catalog;
 	}
 
 	public int getSize() {
@@ -52,14 +44,6 @@ public class ProductVO {
 
 	public void setSalePrice(int salePrice) {
 		this.salePrice = salePrice;
-	}
-
-	public int[] getSubimgId() {
-		return subimgId;
-	}
-
-	public void setSubimgId(int[] subimgId) {
-		this.subimgId = subimgId;
 	}
 
 	public String getMainImg() {
@@ -168,13 +152,12 @@ public class ProductVO {
 
 	@Override
 	public String toString() {
-		return "ProductVO [productId=" + productId + ", catalog=" + catalog + ", size=" + size + ", price=" + price
-				+ ", salePrice=" + salePrice + ", stockQuantity=" + stockQuantity + ", discount_price=" + discount_price
-				+ ", subimgId=" + Arrays.toString(subimgId) + ", standardSize=" + Arrays.toString(standardSize)
-				+ ", mainImg=" + mainImg + ", description=" + description + ", productName=" + productName
-				+ ", modelName=" + modelName + ", brand=" + brand + ", saleStatus=" + saleStatus + ", discountFlag="
-				+ discountFlag + ", sizes=" + Arrays.toString(sizes) + ", createAt=" + createAt + ", finishAt="
-				+ finishAt + "]";
+		return "ProductVO [productId=" + productId + ", size=" + size + ", price=" + price + ", salePrice=" + salePrice
+				+ ", stockQuantity=" + stockQuantity + ", discount_price=" + discount_price + ", standardSize="
+				+ Arrays.toString(standardSize) + ", mainImg=" + mainImg + ", description=" + description
+				+ ", productName=" + productName + ", modelName=" + modelName + ", brand=" + brand + ", saleStatus="
+				+ saleStatus + ", discountFlag=" + discountFlag + ", sizes=" + Arrays.toString(sizes) + ", createAt="
+				+ createAt + ", finishAt=" + finishAt + "]";
 	}
 
 }

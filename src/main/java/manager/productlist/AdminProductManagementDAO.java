@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import kr.co.sist.dao.DbConnection;
@@ -33,7 +34,7 @@ public class AdminProductManagementDAO {
 	 * @return 게시물의 수
 	 * @throws SQLException
 	 */
-	public int selectTotalCount(manager.util.SearchVO sVO) throws SQLException {
+	public int selectTotalCount(manager.util.AdminSearchVO sVO) throws SQLException {
 		int totalCount = 0;
 
 		Connection con = null;
@@ -324,7 +325,7 @@ public class AdminProductManagementDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<ProductVO> selectBoard(manager.util.SearchVO sVO) throws SQLException {
+	public List<ProductVO> selectBoard(manager.util.AdminSearchVO sVO) throws SQLException {
 		List<ProductVO> list = new ArrayList<>();
 
 		Connection con = null;
@@ -886,6 +887,5 @@ public class AdminProductManagementDAO {
 		}
 
 		return rowCnt;
-	}
-
-}
+	}// deleteSizes
+}// class

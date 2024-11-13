@@ -11,19 +11,19 @@ import kr.co.sist.dao.DbConnection;
 
 public class AdminSalesManagementDAO {
 
-	private static AdminSalesManagementDAO apmDAO;
+	private static AdminSalesManagementDAO asmDAO;
 
 	private AdminSalesManagementDAO() {
 
 	}// AdminProductManagementDAO
 
 	public static AdminSalesManagementDAO getInstance() {
-		if (apmDAO == null) {
+		if (asmDAO == null) {
 
-			apmDAO = new AdminSalesManagementDAO();
+			asmDAO = new AdminSalesManagementDAO();
 		}
 
-		return apmDAO;
+		return asmDAO;
 	}// getInstance
 
 	/**
@@ -33,7 +33,7 @@ public class AdminSalesManagementDAO {
 	 * @return 게시물의 수
 	 * @throws SQLException
 	 */
-	public int selectTotalCount(manager.util.SearchVO sVO) throws SQLException {
+	public int selectTotalCount(manager.util.AdminSearchVO sVO) throws SQLException {
 		int totalCount = 0;
 
 		Connection con = null;
@@ -125,86 +125,6 @@ public class AdminSalesManagementDAO {
 	}// deleteOrders
 
 	/**
-	 * 배송상태 변경
-	 * 
-	 * @param saleStatus
-	 * @param productIds
-	 * @return
-	 * @throws SQLException
-	 */
-	public int updateDeliveryStatus(String deliveryStatus, int[] orderIds) throws SQLException {
-		int rowCnt = 0;
-
-		Connection con = null;
-		PreparedStatement pstmt = null;
-
-		DbConnection dbCon = DbConnection.getInstance();
-
-		try {
-			// connection 얻기
-			con = dbCon.getConn();
-			// 쿼리문 생성 객체 얻기
-			String updateDeliveryStatus = "UPDATE DELIVERY SET STATUS = ? WHERE ORDER_ID = ?";
-			pstmt = con.prepareStatement(updateDeliveryStatus);
-
-			// orderIds 배열의 각 항목에 대해 반복하여 업데이트
-			for (int orderId : orderIds) {
-				// 바인드 변수에 값 설정
-				pstmt.setString(1, deliveryStatus);
-				pstmt.setInt(2, orderId);
-
-				// 쿼리문 수행 후 결과 얻기
-				rowCnt += pstmt.executeUpdate();
-			}
-		} finally {
-			dbCon.dbClose(null, pstmt, con);
-		} // end finally
-
-		return rowCnt;
-
-	}// updateDeliveryStatus
-
-	/**
-	 * 주문상태 변경
-	 * 
-	 * @param saleStatus
-	 * @param productIds
-	 * @return
-	 * @throws SQLException
-	 */
-	public int updateOrderStatus(String orderStatus, int[] orderIds) throws SQLException {
-		int rowCnt = 0;
-
-		Connection con = null;
-		PreparedStatement pstmt = null;
-
-		DbConnection dbCon = DbConnection.getInstance();
-
-		try {
-			// connection 얻기
-			con = dbCon.getConn();
-			// 쿼리문 생성 객체 얻기
-			String updateOrderStatus = "	update ORDERS set ORDER_STATUS = ? where ORDER_ID=? 	";
-			pstmt = con.prepareStatement(updateOrderStatus);
-
-			// orderIds 배열의 각 항목에 대해 반복하여 업데이트
-			for (int orderId : orderIds) {
-				// 바인드 변수에 값 설정
-				pstmt.setString(1, orderStatus);
-				pstmt.setInt(2, orderId);
-
-				// 쿼리문 수행 후 결과 얻기
-				rowCnt += pstmt.executeUpdate();
-			}
-		} finally {
-			dbCon.dbClose(null, pstmt, con);
-		} // end finally
-
-		return rowCnt;
-
-	}// updateOrderStatus
-
-	/**
 	 * 주문목록을 조회하는 method
 	 * 
 	 * @return list
@@ -261,7 +181,7 @@ public class AdminSalesManagementDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<OrderVO> selectBoard(manager.util.SearchVO sVO) throws SQLException {
+	public List<OrderVO> selectBoard(manager.util.AdminSearchVO sVO) throws SQLException {
 		List<OrderVO> list = new ArrayList<>();
 
 		Connection con = null;
@@ -471,6 +391,6 @@ public class AdminSalesManagementDAO {
 		}
 
 		return rowCnt;
-	}
+	}// updateDeliveryOrderStatus
 
 }

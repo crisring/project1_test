@@ -399,33 +399,32 @@ function updateTotalPrice() {
 });
 
 		// 추가 이미지 미리보기
-		$('#additionalImages').change(
-				function(event) {
-					const files = event.target.files; // 선택된 파일들 가져오기
-					const previewContainer = $('#additionalImagePreviews');
-					previewContainer.empty(); // 이전 미리보기 이미지 지우기
+	    $('#additionalImages').change(function(event) {
+	        const files = event.target.files; // 선택된 파일들 가져오기
+	        const previewContainer = $('#additionalImagePreviews');
+	        previewContainer.empty(); // 이전 미리보기 이미지 지우기
 
-					// 선택된 파일 개수 검사
-					if (files.length > 5) {
-						alert("추가 이미지는 최대 5개까지 선택할 수 있습니다.");
-						return;
-					}
+	        // 선택된 파일 개수 검사
+	        if (files.length > 5) {
+	            alert("추가 이미지는 최대 5개까지 선택할 수 있습니다.");
+	            return;
+	        }
 
-					for (let i = 0; i < files.length; i++) { // 최대 5개까지 처리
-						const file = files[i];
-						const reader = new FileReader(); // FileReader 객체 생성
+	        // 추가 이미지 미리보기
+	        for (let i = 0; i < files.length; i++) {
+	            const file = files[i];
+	            const reader = new FileReader(); // FileReader 객체 생성
 
-						reader.onload = function(e) {
-							const imgElement = $('<img>').attr('src',
-									e.target.result).show(); // jQuery를 사용해 이미지 생성
-							previewContainer.append(imgElement); // 미리보기 컨테이너에 추가
-						}
+	            reader.onload = function(e) {
+	                const imgElement = $('<img>').attr('src', e.target.result).show(); // jQuery를 사용해 이미지 생성
+	                previewContainer.append(imgElement); // 미리보기 컨테이너에 추가
+	            };
 
-						if (file) {
-							reader.readAsDataURL(file); // 파일을 Data URL로 읽기
-						}
-					}
-				});
+	            if (file) {
+	                reader.readAsDataURL(file); // 파일을 Data URL로 읽기
+	            }
+	        }
+	    });
 
 	});
 </script>

@@ -2,7 +2,8 @@
 <%@page import="manager.productlist.ProductVO"%>
 <%@page import="java.util.List"%>
 <%@page import="manager.productlist.AdminProductManagementDAO"%>
-<%@ page contentType="text/html; charset=UTF-8" language="java"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java"
+	trimDirectiveWhitespaces="true"%>
 <%
 request.setCharacterEncoding("UTF-8");
 %>
@@ -54,17 +55,11 @@ try {
 	brandSelect, modelName, stockQuantity, productId);
 
 	// 삭제 후 다시 추가
-	int sizeCnt = apmDAO.deleteSizes(productId);
-	if (sizeCnt > 0) {
-		apmDAO.insertSize(productId, sizeInts);
-	}
+	apmDAO.deleteSizes(productId);
+	apmDAO.insertSize(productId, sizeInts);
 
-	// 삭제 후 다시 추가
-	int subImgCnt = apmDAO.deleteSubimg(productId);
-	if (subImgCnt > 0) {
-		apmDAO.insertSubImg(productId, subImgArr);
-	}
-
+	apmDAO.deleteSubimg(productId);
+	apmDAO.insertSubImg(productId, subImgArr);
 	msg = "제품이 성공적으로 변경되었습니다.";
 } catch (Exception e) {
 	e.printStackTrace();

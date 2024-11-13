@@ -1,6 +1,6 @@
 package manager.util;
 
-public class BoardUtil {
+public class AdminBoardUtil {
 
 	/**
 	 * 페이지네이션을 사용하면 매개변수로 입력되는 객체의 현재 페이지번호, 전체 페이지수, 검색 수 <br>
@@ -10,7 +10,7 @@ public class BoardUtil {
 	 * @return
 	 */
 
-	public String pagination(SearchVO sVO) {
+	public String pagination(AdminSearchVO sVO) {
 		StringBuilder pagination = new StringBuilder();
 
 		// 검색 수가 0이 아닐 때만 페이지네이션을 보여줌
@@ -65,7 +65,7 @@ public class BoardUtil {
 	}
 
 	// 공통 검색 조건 추가 함수
-	private void appendParameters(StringBuilder sb, SearchVO sVO) {
+	private void appendParameters(StringBuilder sb, AdminSearchVO sVO) {
 		if (sVO.getProductName() != null && !sVO.getProductName().isEmpty()) {
 			sb.append("&productName=").append(sVO.getProductName());
 		}
@@ -76,10 +76,10 @@ public class BoardUtil {
 			sb.append("&saleStatus=").append(sVO.getSaleStatus());
 		}
 		if (sVO.getStartDate() != null && !sVO.getStartDate().isEmpty()) {
-			sb.append("&startDate=").append(sVO.getStartDate());
+			sb.append("&start-date=").append(sVO.getStartDate()); // 수정: start-date로 변경
 		}
 		if (sVO.getEndDate() != null && !sVO.getEndDate().isEmpty()) {
-			sb.append("&endDate=").append(sVO.getEndDate());
+			sb.append("&end-date=").append(sVO.getEndDate()); // 수정: end-date로 변경
 		}
 		if (sVO.getSortBy() != null && !sVO.getSortBy().isEmpty()) {
 			sb.append("&sortBy=").append(sVO.getSortBy());
@@ -87,9 +87,11 @@ public class BoardUtil {
 		if (sVO.getOrderStatus() != null && !sVO.getOrderStatus().isEmpty()) {
 			sb.append("&orderStatus=").append(sVO.getOrderStatus());
 		}
-		// pageScale 파라미터 추가
 		if (sVO.getPageScale() > 0) {
 			sb.append("&pageScale=").append(sVO.getPageScale());
+		}
+		if (sVO.getDateType() != null && !sVO.getDateType().isEmpty()) {
+			sb.append("&date-type=").append(sVO.getDateType());
 		}
 	}
 

@@ -1,6 +1,6 @@
 <%@page import="java.sql.SQLException"%>
-<%@page import="manager.util.SearchVO"%>
-<%@page import="manager.util.BoardUtil"%>
+<%@page import="manager.util.AdminSearchVO"%>
+<%@page import="manager.util.AdminBoardUtil"%>
 <%@page import="java.util.List"%>
 <%@page import="manager.productlist.ProductVO"%>
 <%@page import="manager.productlist.AdminProductManagementDAO"%>
@@ -224,10 +224,42 @@ table {
 	align-items: center;
 	text-align: center;
 }
+
+/* 데스크탑 화면 (1025px 이상) */
+@media ( min-width : 1025px) {
+	#status-container {
+		flex-direction: row;
+	}
+	.icon {
+		width: 50px;
+		height: 50px;
+		font-size: 24px;
+	}
+	#search-container {
+		padding: 20px;
+	}
+	.btn-search, .btn-reset, .btn-save {
+		padding: 12px 30px;
+		font-size: 16px;
+	}
+	.product-list-actions {
+		flex-direction: row;
+	}
+	.product-count {
+		font-size: 14px;
+	}
+	.action-buttons button {
+		padding: 10px 20px;
+		font-size: 14px;
+	}
+	table {
+		font-size: 13px;
+	}
+}
 </style>
 
 <!-- 리스트 -->
-<jsp:useBean id="sVO" class="manager.util.SearchVO" scope="page" />
+<jsp:useBean id="sVO" class="manager.util.AdminSearchVO" scope="page" />
 <jsp:setProperty property="*" name="sVO" />
 <%
 AdminProductManagementDAO apmDAO = AdminProductManagementDAO.getInstance();
@@ -499,43 +531,51 @@ request.setAttribute("sortBy", sortBy);
 <script type="text/javascript">
 	$(function() {
 
-		$("#sortBy").change(function() {
-			arrange();
-		});// change
+		// 정렬 기준 또는 페이지당 항목 수 변경 시 실행될 함수
+		function updateProductList() {
+			// 현재 URL 가져오기
+			let currentUrl = new URL(window.location.href);
+			let searchParams = currentUrl.searchParams;
 
-		$("#count_product").change(function() {
-			changePageScale();
-		});// change
-	});// ready
+			// 각 hidden input 요소에서 필요한 파라미터 값 가져오기
+			let productName = $('#pramProduct').val() || '';
+			let brand = $('#paramBrand').val() || '';
+			let salesStatus = $('#paramStatus').val() || '';
+			let dateType = $('#paramDateType').val() || '';
+			let startDate = $('#paramStartDate').val() || '';
+			let endDate = $('#paramEndDate').val() || '';
+			let sortBy = $('#sortBy').val() || '';
+			let pageScale = $('#count_product').val() || '';
 
-	function arrange() {
+			// 새로운 URL 생성
+			let newUrl = 'productList.jsp?'
+					+ 'pageScale='
+					+ encodeURIComponent(pageScale)
+					+ (productName ? '&product-name='
+							+ encodeURIComponent(productName) : '')
+					+ (brand ? '&brand=' + encodeURIComponent(brand) : '')
+					+ (salesStatus ? '&sales-status='
+							+ encodeURIComponent(salesStatus) : '')
+					+ (dateType ? '&date-type=' + encodeURIComponent(dateType)
+							: '')
+					+ (startDate ? '&start-date='
+							+ encodeURIComponent(startDate) : '')
+					+ (endDate ? '&end-date=' + encodeURIComponent(endDate)
+							: '')
+					+ (sortBy ? '&sortBy=' + encodeURIComponent(sortBy) : '')
+					+ '&currentPage=1'; // 페이지 수가 변경되면 첫 페이지로 이동
 
-		// 정렬할 값 가져오기
-		var sortBy = $('#sortBy').val();
+			// 페이지 이동
+			window.location.href = newUrl;
+		}
 
-		// 각 hidden input 요소의 값을 가져오기
-		const pramProduct = $('#pramProduct').val();
-		const paramBrand = $('#paramBrand').val();
-		const paramStatus = $('#paramStatus').val();
-		const paramDateType = $('#paramDateType').val();
-		const paramStartDate = $('#paramStartDate').val();
-		const paramEndDate = $('#paramEndDate').val();
+		// 페이지당 항목 수가 변경될 때 이벤트 처리
+		$('#count_product').on('change', updateProductList);
 
-		// 가져온 값들을 출력
-		console.log("Product Name:", pramProduct);
-		console.log("Brand:", paramBrand);
-		console.log("Sales Status:", paramStatus);
-		console.log("Date Type:", paramDateType);
-		console.log("Start Date:", paramStartDate);
-		console.log("End Date:", paramEndDate);
-		console.log("Sort By:", sortBy);
+		// 정렬 기준이 변경될 때 이벤트 처리
+		$('#sortBy').on('change', updateProductList);
 
-		$('#sortFrm').submit();
-	}
-
-	function changePageScale() {
-
-	}
+	});
 </script>
 
 <!-- 게시물 수 검색  -->
@@ -687,49 +727,6 @@ request.setAttribute("sortBy", sortBy);
 </script>
 
 
-<script type="text/javascript">
-	$(function() {
-
-		$('#count_product').on(
-				'change',
-				function() {
-					// 현재 URL 가져오기
-					let currentUrl = new URL(window.location.href);
-					let searchParams = currentUrl.searchParams;
-
-					// 기존 파라미터 유지
-					let productName = searchParams.get('product-name') || '';
-					let brand = searchParams.get('brand') || '';
-					let salesStatus = searchParams.get('sales-status') || '';
-					let dateType = searchParams.get('date-type') || '';
-					let startDate = searchParams.get('start-date') || '';
-					let endDate = searchParams.get('end-date') || '';
-					let sortBy = searchParams.get('sortBy') || '';
-
-					// 새로운 URL 생성
-					let newUrl = 'productList.jsp?'
-							+ 'pageScale='
-							+ $(this).val()
-							+ (productName ? '&product-name='
-									+ encodeURIComponent(productName) : '')
-							+ (brand ? '&brand=' + encodeURIComponent(brand)
-									: '')
-							+ (salesStatus ? '&sales-status='
-									+ encodeURIComponent(salesStatus) : '')
-							+ (dateType ? '&date-type='
-									+ encodeURIComponent(dateType) : '')
-							+ (startDate ? '&start-date='
-									+ encodeURIComponent(startDate) : '')
-							+ (endDate ? '&end-date='
-									+ encodeURIComponent(endDate) : '')
-							+ (sortBy ? '&sortBy=' + encodeURIComponent(sortBy)
-									: '') + '&currentPage=1'; // 페이지 수가 변경되면 첫 페이지로 이동
-
-					// 페이지 이동
-					window.location.href = newUrl;
-				});
-	}); // ready
-</script>
 
 </head>
 <body>
@@ -842,16 +839,17 @@ request.setAttribute("sortBy", sortBy);
 					<input type="hidden" id="paramStartDate" name="paramStartDate"
 						value="${startDate}"> <input type="hidden"
 						id="paramEndDate" name="paramEndDate" value="${endDate}">
+					<input type="hidden" id="paramSortBy" name="paramSortBy"
+						value="${sortBy}">
 
 					<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
 					<div class="product-count">
 						<span style="margin-right: 10px;">상품 목록(총 <%=sVO.getTotalCount()%>개)
 						</span> <select id="sortBy" name="sortBy">
-							<option>정렬기준</option>
+							<option value="">정렬기준</option>
 							<option value="NAME">상품명순</option>
 							<option value="PRICE">판매가 낮은순</option>
 							<option value="PRICE DESC">판매가 높은순</option>
-
 						</select> <select id="count_product" name="count_product">
 							<option value="10" <%=pageScale == 10 ? "selected" : ""%>>10개씩</option>
 							<option value="5" <%=pageScale == 5 ? "selected" : ""%>>5개씩</option>
@@ -933,7 +931,7 @@ request.setAttribute("sortBy", sortBy);
 
 				<!-- 페이지네이션 -->
 				<div id="pagination">
-					<%=new BoardUtil().pagination(sVO)%>
+					<%=new AdminBoardUtil().pagination(sVO)%>
 				</div>
 				<br>
 

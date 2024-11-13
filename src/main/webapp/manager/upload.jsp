@@ -2,7 +2,7 @@
 <%@page import="com.oreilly.servlet.MultipartRequest"%>
 <%@page import="java.io.File"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 
 <%
 boolean uploadFlag = (boolean) session.getAttribute("uploadFlag");
@@ -22,16 +22,16 @@ if (!uploadFlag) {
 		// 중복 파일 체크
 		File existingFile = new File(saveDir.getAbsolutePath() + "/" + fileSysname);
 		if (existingFile.exists()) {
-			existingFile.delete(); // 기존 파일 삭제
-			out.print("기존의 " + originName + " 파일이 삭제되었습니다. 새로 업로드를 시작합니다.<br>");
+	existingFile.delete(); // 기존 파일 삭제
+	out.print("기존의 " + originName + " 파일이 삭제되었습니다. 새로 업로드를 시작합니다.<br>");
 		}
 
 		File uploadFile = new File(saveDir.getAbsolutePath() + "/" + fileSysname);
 		if (uploadFile.length() > maxSize) {
-			uploadFile.delete(); // 파일 삭제
-			out.print(originName + "은 12MB를 초과합니다. 업로드 파일의 크기내의 파일로 변환하여 업로드 해주세요.");
+	uploadFile.delete(); // 파일 삭제
+	out.print(originName + "은 12MB를 초과합니다. 업로드 파일의 크기내의 파일로 변환하여 업로드 해주세요.");
 		} else {
-			out.print("파일 업로드 성공!");
+	out.print("파일 업로드 성공!");
 		}
 	} catch (Exception e) {
 		e.printStackTrace();

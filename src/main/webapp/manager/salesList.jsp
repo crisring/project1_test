@@ -1,5 +1,5 @@
-<%@page import="manager.util.SearchVO"%>
-<%@page import="manager.util.BoardUtil"%>
+<%@page import="manager.util.AdminSearchVO"%>
+<%@page import="manager.util.AdminBoardUtil"%>
 <%@page import="java.sql.SQLException"%>
 <%@page import="manager.saleslist.AdminSalesManagementDAO"%>
 <%@page import="manager.saleslist.OrderVO"%>
@@ -361,8 +361,6 @@ table {
 			var selecteddeliveryType = $("#sale-type").val();
 			var selectedOrderType = $("#order-type").val();
 
-			alert(selecteddeliveryType + " / " + selectedOrderType)
-
 			if (checkedOrderIds.length > 0) {
 				if (selecteddeliveryType || selectedOrderType) {
 					$.ajax({
@@ -498,13 +496,51 @@ table {
 	}
 </script>
 
+<!-- 정렬 검색 -->
+<script type="text/javascript">
+	$(function() {
+
+		// 페이지당 항목 수 변경 시 실행될 함수
+		function updateProductList() {
+			// 현재 URL 가져오기
+			let currentUrl = new URL(window.location.href);
+			let searchParams = currentUrl.searchParams;
+
+			// 각 hidden input 요소에서 필요한 파라미터 값 가져오기
+			let status = $('#paramStatus').val() || '';
+			let startDate = $('#paramStartDate').val() || '';
+			let endDate = $('#paramEndDate').val() || '';
+			let pageScale = $('#count_product').val() || '';
+
+			// 새로운 URL 생성
+			let newUrl = 'salesList.jsp?'
+					+ 'paramStatus='
+					+ encodeURIComponent(status)
+					+ (startDate ? '&paramStartDate='
+							+ encodeURIComponent(startDate) : '')
+					+ (endDate ? '&paramEndDate=' + encodeURIComponent(endDate)
+							: '')
+					+ (pageScale ? '&pageScale='
+							+ encodeURIComponent(pageScale) : '')
+					+ '&currentPage=1'; // 페이지 수가 변경되면 첫 페이지로 이동
+
+			// 페이지 이동
+			window.location.href = newUrl;
+		}
+
+		// 페이지당 항목 수가 변경될 때 이벤트 처리
+		$('#count_product').on('change', updateProductList);
+
+	});
+</script>
+
 </head>
 <body>
 
 	<!-- 사이드바 포함 -->
 	<jsp:include page="sidebar.jsp"></jsp:include>
 
-	<jsp:useBean id="sVO" class="manager.util.SearchVO" scope="page" />
+	<jsp:useBean id="sVO" class="manager.util.AdminSearchVO" scope="page" />
 	<jsp:setProperty property="*" name="sVO" />
 
 	<%
@@ -533,8 +569,16 @@ table {
 		se.printStackTrace();
 	}
 
-	// 페이지 당 레코드 수 및 페이지 수 계산
-	final int pageScale = 10;
+	//페이지당 보여줄 게시물 수
+	int pageScale = 10;
+	String paramPageScale = request.getParameter("pageScale");
+	if (paramPageScale != null && !paramPageScale.trim().isEmpty()) {
+		try {
+			pageScale = Integer.parseInt(paramPageScale);
+		} catch (NumberFormatException e) {
+			pageScale = 10; // 파싱 실패시 기본값 사용
+		}
+	}
 
 	int totalPage = (int) Math.ceil((double) totalCount / pageScale);
 
@@ -661,89 +705,104 @@ table {
 
 		<!-- 주문 목록 -->
 		<div class="content-box" id="content-box4">
-			<div class="product-list-actions">
-				<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
-				<div class="product-count">
-					<span>주문 목록(총 <%=sVO.getTotalCount()%>개)
-					</span> <input type="button" id="deleteBtn" class="select-delete-btn"
-						value="선택삭제">
+
+			<form action="salesList.jsp" method="get" name="sortFrm" id="sortFrm">
+
+				<!-- hidden으로 값 설정 -->
+				<input type="hidden" id="paramStatus" name="paramStatus"
+					value="${orderStatus}"> <input type="hidden"
+					id="paramStartDate" name="paramStartDate" value="${startDate}">
+				<input type="hidden" id="paramEndDate" name="paramEndDate"
+					value="${endDate}">
+
+
+				<div class="product-list-actions">
+					<!-- 상품 목록 카운트 및 정렬, 선택삭제 -->
+					<div class="product-count">
+						<span>주문 목록(총 <%=sVO.getTotalCount()%>개)
+						</span> <select id="count_product" name="count_product">
+							<option value="10" <%=pageScale == 10 ? "selected" : ""%>>10개씩</option>
+							<option value="5" <%=pageScale == 5 ? "selected" : ""%>>5개씩</option>
+							<option value="15" <%=pageScale == 15 ? "selected" : ""%>>15개씩</option>
+						</select>
+					</div>
+
+					<!-- 교환처리, 주문상태 -->
+					<div class="product-count">
+						<input type="button" id="deleteBtn" class="select-delete-btn"
+							value="선택삭제"> <select id="order-type" name="order-type"
+							class="form-select" aria-label="Default select example">
+							<option value="">주문상태</option>
+							<option value="구매확정">구매확정</option>
+							<option value="결제완료">결제완료</option>
+							<option value="취소요청">취소요청</option>
+						</select> <select id="sale-type" name="sale-type" class="form-select"
+							aria-label="Default select example">
+							<option value="">배송상태</option>
+							<option value="베송준비">배송준비</option>
+							<option value="배송중">배송중</option>
+							<option value="배송완료">배송완료</option>
+						</select>
+					</div>
 				</div>
 
-				<!-- 교환처리, 주문상태 -->
-				<div class="product-count">
-					<select id="order-type" name="order-type" class="form-select"
-						aria-label="Default select example">
-						<option value="">주문상태</option>
-						<option value="구매확정">구매확정</option>
-						<option value="결제완료">결제완료</option>
-						<option value="취소요청">취소요청</option>
-					</select> <select id="sale-type" name="sale-type" class="form-select"
-						aria-label="Default select example">
-						<option value="">배송상태</option>
-						<option value="베송준비">배송준비</option>
-						<option value="배송중">배송중</option>
-						<option value="배송완료">배송완료</option>
-					</select>
+				<hr>
+
+
+
+				<!-- 상품 테이블 -->
+				<table class="table">
+					<thead class="table-light">
+						<tr>
+							<td><input type="checkbox" id="select-all"></td>
+							<td>주문번호</td>
+							<td>주문명</td>
+							<td>주문상태</td>
+							<td>배송상태</td>
+							<td>구매자ID</td>
+							<td>주문날짜</td>
+						</tr>
+					</thead>
+
+					<tbody>
+
+
+						<c:if test="${ empty saleslist }">
+							<tr>
+								<td style="text-align: center" colspan="7">조회 가능한 항목이 없습니다.<br>
+								</td>
+							</tr>
+						</c:if>
+
+
+						<c:forEach var="item" items="${saleslist}">
+							<tr>
+								<td><input type="checkbox" class="chk"
+									data-orderId="${item.orderId}"></td>
+								<td>${item.orderId}</td>
+								<td>${item.orderName}</td>
+								<td>${item.orderStatus}</td>
+								<td>${item.shippingStatus}</td>
+								<td>${item.userId}</td>
+								<td>${item.orderDate}</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+
+				<!-- 페이지네이션 -->
+				<div id="pagination">
+					<%=new AdminBoardUtil().pagination(sVO)%>
 				</div>
-			</div>
+				<br>
 
-			<hr>
+				<!-- 저장 버튼 -->
+				<div class="search-item button-group">
+					<input type="button" id="btnSubmit" name="btnSubmit"
+						class="btn-save" value="수정 항목 저장">
+				</div>
 
-
-
-			<!-- 상품 테이블 -->
-			<table class="table">
-				<thead class="table-light">
-					<tr>
-						<td><input type="checkbox" id="select-all"></td>
-						<td>주문번호</td>
-						<td>주문명</td>
-						<td>주문상태</td>
-						<td>배송상태</td>
-						<td>구매자ID</td>
-						<td>주문날짜</td>
-					</tr>
-				</thead>
-
-				<tbody>
-
-
-					<c:if test="${ empty saleslist }">
-						<tr>
-							<td style="text-align: center" colspan="7">조회 가능한 항목이 없습니다.<br>
-							</td>
-						</tr>
-					</c:if>
-
-
-					<c:forEach var="item" items="${saleslist}">
-						<tr>
-							<td><input type="checkbox" class="chk"
-								data-orderId="${item.orderId}"></td>
-							<td>${item.orderId}</td>
-							<td>${item.orderName}</td>
-							<td>${item.orderStatus}</td>
-							<td>${item.shippingStatus}</td>
-							<td>${item.userId}</td>
-							<td>${item.orderDate}</td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-
-			<!-- 페이지네이션 -->
-			<div id="pagination">
-				<%=new BoardUtil().pagination(sVO)%>
-			</div>
-			<br>
-
-			<!-- 저장 버튼 -->
-			<div class="search-item button-group">
-				<input type="button" id="btnSubmit" name="btnSubmit"
-					class="btn-save" value="수정 항목 저장">
-			</div>
-
-
+			</form>
 		</div>
 
 	</div>

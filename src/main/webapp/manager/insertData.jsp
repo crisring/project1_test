@@ -2,7 +2,9 @@
 <%@page import="manager.productlist.ProductVO"%>
 <%@page import="java.util.List"%>
 <%@page import="manager.productlist.AdminProductManagementDAO"%>
-<%@ page contentType="text/html; charset=UTF-8" language="java"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java"
+	trimDirectiveWhitespaces="true"%>
+
 <%
 request.setCharacterEncoding("UTF-8");
 %>
