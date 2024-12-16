@@ -1,0 +1,333 @@
+ /* 기본 레이아웃 */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* 그리드 레이아웃 */
+.orders-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* 주문 컨테이너 */
+.order-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 20px rgba(175, 125, 231, 0.08);
+    padding: 20px;
+    border: 1px solid rgba(175, 125, 231, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+}
+
+.order-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px rgba(175, 125, 231, 0.12);
+}
+
+/* 상품 정보 */
+.order-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(175, 125, 231, 0.03);
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.order-info img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.product-name {
+    text-align: center;
+}
+
+.product-name h2 {
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* 진행 상태 표시 */
+.progress-container {
+    margin: 20px 0;
+    position: relative;
+    padding: 0 10px;
+}
+
+.progress-bar {
+    position: relative;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+}
+
+/* 진행 단계 */
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 33.33%;
+    position: relative;
+}
+
+.circle {
+    width: 18px;
+    height: 18px;
+    background-color: #E6E6FA;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.step.active .circle {
+    background-color: #AF7DE7;
+}
+
+.step span {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.step.active span {
+    color: #AF7DE7;
+}
+
+/* 진행 라인 */
+.progress-line {
+    position: absolute;
+    top: 9px;
+    left: calc(9px + 3%);
+    right: calc(9px + 3%);
+    height: 2px;
+    background-color: #E6E6FA;
+    z-index: 1;
+}
+
+/* 구매확정 상태 */
+.order-confirmed {
+    background-color: #faf8ff !important;
+    border: 1px solid #AF7DE7 !important;
+    box-shadow: 0 2px 15px rgba(175, 125, 231, 0.1) !important;
+}
+
+.order-confirmed .progress-steps .step .circle {
+    background-color: #AF7DE7;
+}
+
+.order-confirmed .progress-steps .step span {
+    color: #AF7DE7;
+    font-weight: 600;
+}
+
+.order-confirmed .progress-line {
+    background-color: #AF7DE7 !important;
+}
+
+/* 버튼 */
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(175, 125, 231, 0.1);
+}
+
+.confirm-btn, .cancel {
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: calc(50% - 4px);
+}
+
+.confirm-btn {
+    background-color: #AF7DE7;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background-color: #9f6dd7;
+    transform: translateY(-1px);
+}
+
+.cancel {
+    background-color: white;
+    color: #666;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.cancel:hover {
+    border-color: #AF7DE7;
+    color: #AF7DE7;
+    transform: translateY(-1px);
+}
+
+/* 구매확정 버튼 상태 */
+.btn-confirmed {
+    background-color: #AF7DE7 !important;
+    color: white !important;
+    cursor: default !important;
+    opacity: 0.8;
+}
+
+.btn-confirmed:hover {
+    transform: none !important;
+}
+
+/* 구매확정 메시지 */
+.confirm-message {
+    text-align: center;
+    padding: 12px;
+    background-color: #faf8ff;
+    color: #AF7DE7;
+    border: 1px solid #AF7DE7;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: none;
+}
+
+.order-confirmed .confirm-message {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+/* 주문 없음 메시지 */
+.no-orders {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 20px rgba(175, 125, 231, 0.08);
+    margin: 20px auto;
+    color: #666;
+    font-size: 15px;
+    border: 1px solid rgba(175, 125, 231, 0.1);
+    max-width: 400px;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+/* 리뷰 버튼 */
+.review {
+    background-color: #AF7DE7;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+}
+
+.review:hover {
+    background-color: #9f6dd7;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+    .orders-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 768px) {
+    .orders-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        padding: 0 15px;
+    }
+
+    .order-info img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .button-container {
+        flex-direction: column;
+    }
+
+    .confirm-btn, .cancel {
+        width: 100%;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+}

@@ -1,0 +1,445 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #ffffff;
+	overflow-x: hidden;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+/* 헤더 스타일 */
+.header {
+	background-color: #AF7DE7;
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header-content {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	max-width: 1200px;
+	padding: 0 20px;
+}
+
+.header img {
+	width: 150px;
+	height: auto;
+	margin-left: 50px;
+}
+
+.search-and-login {
+	display: flex;
+	align-items: center;
+}
+
+.search-bar {
+	display: flex;
+	margin-right: 10px;
+	background-color: white;
+	border-radius: 50px;
+	overflow: hidden;
+	position: relative;
+}
+
+.search-bar input {
+	padding: 8px 15px;
+	width: 200px;
+	border: none;
+	outline: none;
+	border-radius: 50px;
+}
+
+.search-bar button {
+	background: none;
+	border: none;
+	color: #9f7aea;
+	cursor: pointer;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.auth-buttons {
+	display: flex;
+	gap: 10px;
+}
+
+.login-button, .auth-button {
+	background-color: #AF7DE7;
+	color: white;
+	border: 2px solid #7C3AED;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 14px;
+	transition: all 0.2s ease;
+}
+
+.login-button:hover, .auth-button:hover {
+	background-color: #8b5cf6;
+	border-color: #7c3aed;
+}
+
+.logo-container {
+	text-align: center;
+	margin: 15px 0;
+}
+
+.main-logo {
+	width: 150px;
+	height: auto;
+}
+
+/* 네비게이션 섹션 */
+.nav-section {
+	background-color: white;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+	margin: 0;
+	padding: 0;
+}
+
+.nav-wrapper {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+.nav-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.nav-list > li {
+	position: relative;
+}
+
+.nav-item {
+	display: block;
+	padding: 15px 30px;
+	color: gray;
+	text-decoration: none;
+	font-weight: 500;
+	transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+	color: black;
+}
+
+.nav-item.active {
+	color: black;
+	font-weight: 600;
+}
+
+/* 브랜드 서브메뉴 */
+.brand-menu {
+	position: relative;
+}
+
+.brand-menu .nav-item {
+	cursor: pointer;
+}
+
+.brand-submenu {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	background: white;
+	min-width: 180px;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+	border-radius: 4px;
+	padding: 8px 0;
+	z-index: 1000;
+}
+
+.brand-menu:hover .brand-submenu {
+	display: block;
+}
+
+.brand-submenu li {
+	list-style: none;
+}
+
+.brand-submenu a {
+	display: block;
+	padding: 10px 20px;
+	color: gray;
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+.brand-submenu a:hover {
+	background: #f5f5f5;
+	color: black;
+}
+
+.brand-submenu a.active {
+	background: #f5f5f5;
+	color: black;
+	font-weight: 600;
+}
+
+/* 배너 */
+.banner {
+	background-color: #e6f7ff;
+	padding: 5px;
+	text-align: center;
+	font-size: 18px;
+	color: #333;
+	margin: 40px auto 0 auto;
+	max-width: 600px;
+	border-radius: 3px;
+}
+
+/* 상품 섹션 */
+.product-title {
+	text-align: center;
+	margin: 30px 0;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.sort-options {
+	text-align: center;
+	margin: 20px 0;
+}
+
+.sort-link {
+	color: gray;
+	text-decoration: none;
+	margin: 0 10px;
+	font-size: 12px;
+	transition: color 0.3s;
+}
+
+.sort-link:hover {
+	color: black;
+}
+
+.sort-link.active {
+	color: black;
+}
+
+.product-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 20px;
+	padding: 20px;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.product-item {
+	background-color: white;
+	border: 1px solid #eee;
+	padding: 15px;
+	text-align: center;
+	transition: all 0.3s ease;
+	border-radius: 8px;
+}
+
+.product-item:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item img {
+	width: 100%;
+	height: auto;
+	border-radius: 4px;
+}
+
+.product-item h3 {
+	font-size: 14px;
+	margin: 10px 0;
+	color: #333;
+}
+
+.product-item .brand {
+	font-size: 12px;
+	color: #666;
+	margin: 5px 0;
+}
+
+.product-item .price {
+	font-size: 16px;
+	font-weight: bold;
+	color: #AF7DE7;
+	margin: 10px 0;
+}
+
+.no-products-message {
+	grid-column: 1 / -1;
+	text-align: center;
+	padding: 50px;
+	color: #666;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+	.product-grid {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media (max-width: 992px) {
+	.product-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	.nav-item {
+		padding: 15px 20px;
+	}
+}
+
+@media (max-width: 768px) {
+	.product-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.nav-list {
+		flex-direction: column;
+	}
+	.brand-submenu {
+		position: static;
+		display: none;
+	}
+	.brand-menu:hover .brand-submenu {
+		display: block;
+	}
+}
+
+@media (max-width: 480px) {
+	.product-grid {
+		grid-template-columns: 1fr;
+	}
+	.search-bar input {
+		width: 150px;
+	}
+}
+
+/* 푸터 스타일 */
+.footer {
+	background-color: #f8f9fa;
+	padding: 40px 0;
+	margin-top: 50px;
+	border-top: 1px solid #eee;
+	color: #666;
+}
+
+.footer-content {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+.footer-info {
+	margin-bottom: 20px;
+}
+
+.footer-company {
+	font-size: 16px;
+	font-weight: bold;
+	color: #333;
+	margin-bottom: 15px;
+}
+
+.footer-details p {
+	font-size: 13px;
+	line-height: 1.8;
+	margin: 2px 0;
+	color: #666;
+}
+
+.footer-contact {
+	margin: 20px 0;
+	padding: 15px 0;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+}
+
+.footer-contact p {
+	font-size: 13px;
+	margin: 5px 0;
+}
+
+.footer-contact strong {
+	color: #AF7DE7;
+	font-size: 15px;
+}
+
+.business-info {
+	color: #666;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.business-info:hover {
+	color: #AF7DE7;
+}
+
+.footer-links {
+	margin: 20px 0;
+}
+
+.footer-links a {
+	color: #666;
+	text-decoration: none;
+	font-size: 13px;
+	margin-right: 20px;
+	transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+	color: #AF7DE7;
+}
+
+.footer-copy {
+	font-size: 12px;
+	color: #999;
+	margin-top: 20px;
+	text-align: center;
+}
+
+@media (max-width: 768px) {
+	.footer {
+		padding: 30px 0;
+	}
+
+	.footer-content {
+		padding: 0 15px;
+	}
+
+	.footer-company {
+		font-size: 15px;
+	}
+
+	.footer-details p {
+		font-size: 12px;
+	}
+
+	.footer-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+	}
+
+	.footer-links a {
+		margin-right: 0;
+	}
+}
+

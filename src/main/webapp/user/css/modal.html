@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배송지 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 380px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .new-address-btn {
+            display: block;
+            width: 95%;
+            margin: 0 auto 20px;
+            padding: 12px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+        .new-address-btn:hover {
+            background-color: #f0f0f0;
+        }
+        .address-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .address-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .address-item.selected .name {
+            color: #4CAF50;
+        }
+        .address-item .name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .address-item .actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-start;
+        }
+        .edit-btn, .delete-btn {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .edit-btn:hover, .delete-btn:hover {
+            background-color: #f0f0f0;
+        }
+        .address-item .actions button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .delete-btn {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .hidden {
+            display: none;
+        }
+        .input-address {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>배송지 목록</h1>
+        <button class="new-address-btn" onclick="findAddr()">+ 배송지 신규입력</button>
+        <ul class="address-list">
+            <!-- Addresses will be added here dynamically -->
+        </ul>
+    </div>
+
+    <script>
+        const addressList = document.querySelector('.address-list');
+        const newAddressBtn = document.querySelector('.new-address-btn');
+        const selectedAddressInput = document.getElementById('selected-address');
+
+        let addresses = [
+            { id: 1, name: '홍길동', address: '서울시 강남구 테헤란로 123' }
+        ];
+
+        function renderAddresses() {
+            addressList.innerHTML = '';
+            addresses.forEach(addr => {
+                const li = document.createElement('li');
+                li.className = 'address-item';
+                li.dataset.id = addr.id;
+                li.innerHTML = `
+                    <div class="name">${addr.name}</div>
+                    <div class="address">${addr.address}</div>
+                    <div class="actions">
+                        <button class="edit-btn" onclick="findAddr()">수정</button>
+                        <button class="delete-btn">삭제</button>
+                    </div>
+                `;
+                addressList.appendChild(li);
+            });
+        }
+
+        function selectAddress(li, address) {
+            document.querySelectorAll('.address-item').forEach(item => item.classList.remove('selected'));
+            li.classList.add('selected');
+
+            // 다른 페이지로 이동하며 주소 전달
+            window.location.href = `detail.html?address=${encodeURIComponent(address)}`;
+        }
+
+        function addNewAddress() {
+              if (name && address) {
+                const newId = addresses.length > 0 ? Math.max(...addresses.map(a => a.id)) + 1 : 1;
+                addresses.push({ id: newId, name, address });
+                renderAddresses();
+            }
+        }
+
+        function editAddress(id) {
+            const addr = addresses.find(a => a.id === id);
+            if (addr) {
+                const newName = prompt('새로운 이름을 입력하세요:', addr.name);
+                const newAddress = prompt('새로운 주소를 입력하세요:', addr.address);
+                if (newName && newAddress) {
+                    addr.name = newName;
+                    addr.address = newAddress;
+                    renderAddresses();
+                }
+            }
+        }
+
+        function deleteAddress(id) {
+            if (confirm('이 주소를 삭제하시겠습니까?')) {
+                addresses = addresses.filter(a => a.id !== id);
+                renderAddresses();
+            }
+        }
+
+        newAddressBtn.addEventListener('click', addNewAddress);
+
+        addressList.addEventListener('click', (e) => {
+            const li = e.target.closest('.address-item');
+            if (!li) return;
+            const id = parseInt(li.dataset.id);
+            const address = li.querySelector('.address').textContent; 
+            if (e.target.classList.contains('edit-btn')) {
+                editAddress(id);
+            } else if (e.target.classList.contains('delete-btn')) {
+                deleteAddress(id);
+            } else {
+                selectAddress(li, address);
+            }
+        });
+
+        function findAddr() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var addr = '';
+                    if (data.userSelectedType === 'R') {
+                        addr = data.roadAddress;
+                    } else {
+                        addr = data.jibunAddress;
+                    }
+                    selectedAddressInput.value = addr; 
+                }
+            }).open();
+        }
+
+        renderAddresses();
+    </script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</body>
+</html>

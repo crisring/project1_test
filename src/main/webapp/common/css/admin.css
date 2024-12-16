@@ -1,5 +1,3 @@
-@charset "UTF-8";
-
 body, html {
 	margin: 0;
 	padding: 0;
@@ -20,7 +18,6 @@ body, html {
 	display: flex;
 	justify-content: space-between;
 	z-index: 1000;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added shadow */
 }
 
 /* 좌측 고정 사이드바 */
@@ -28,14 +25,13 @@ body, html {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 250px; /* Consider using max-width for responsiveness */
+	width: 250px;
 	height: 100%;
 	background-color: #414B5A;
 	padding-top: 70px;
 	z-index: 999;
 	color: white;
 	overflow-y: auto;
-	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Added shadow */
 }
 
 .sidebar h3 {
@@ -53,7 +49,6 @@ body, html {
 	background-color: #414B5A;
 	border: 1px solid #354b5e; /* 테두리 통일 */
 	border-radius: 0; /* 직각 처리 */
-	transition: background-color 0.3s; /* Smooth hover transition */
 }
 
 .sidebar a:hover, .accordion-button:hover {
@@ -73,22 +68,10 @@ body, html {
 
 .content-box {
 	background-color: white;
-	width: 1500px;
+	width: 100%;
+	min-height: 200px;
 	padding: 20px;
 	box-sizing: border-box;
-}
-
-/* Adjusted sub-title spacing */
-#sub-title {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 15px;
-	color: #000;
-}
-
-#sub-title h4 {
-	color: black;
 }
 
 /* 아코디언 펼쳤을 때도 동일한 테두리 유지 */
@@ -109,7 +92,6 @@ body, html {
 	border-left: 1px solid #354b5e; /* 하위 항목도 테두리 적용 */
 	border-right: 1px solid #354b5e;
 	border-radius: 0; /* 직각 처리 */
-	transition: background-color 0.3s; /* Smooth hover transition */
 }
 
 .accordion-body a:hover {
@@ -120,11 +102,4 @@ body, html {
 .sidebar a:last-of-type {
 	border: 1px solid #354b5e; /* 테두리 통일 */
 	border-radius: 0; /* 직각 처리 */
-}
-
-@media ( max-width : 768px) {
-	.content-box {
-		width: 95%; /* 작은 화면에서 너비 조정 */
-		margin: 10px auto; /* 마진 줄이기 */
-	}
 }

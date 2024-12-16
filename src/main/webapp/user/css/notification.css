@@ -1,0 +1,300 @@
+ table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+section.notice {
+	padding: 80px 0;
+}
+
+body {
+	font-family: 'Malgun Gothic', sans-serif;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.container {
+	width: 100%;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.h {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.title {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.view-all {
+	font-size: 12px;
+	color: #666;
+	text-decoration: none;
+}
+
+hr {
+	border: none;
+	border-top: 1px solid #000;
+	margin: 0 0 15px 0;
+}
+
+.p-title-wrapper {
+	display: flex; 
+	align-items: center;  
+}
+
+.p-title {
+	color: #8000ff;
+	font-size: 14px;
+	margin-bottom: 5px;
+}
+
+.basic-notice {
+	margin-left: 5px;  
+	font-size: 14px; 
+}
+
+.post-info {
+	color: #666;
+	font-size: 12px;
+	margin: 10px 0;  
+}
+
+.post-info-line {
+	border-top: 1px solid #ccc;  
+	margin: 5px 0;  
+}
+
+.content-image {
+	width: 100%;
+	max-width: 800px;
+	height: auto;
+	margin: 40px 0; 
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.nav-button {
+	color: gray;  
+	text-decoration: none;
+	padding: 10px 15px;
+	display: inline-block;
+}
+
+.nav-button:hover {
+	color: black;  
+}
+
+.nav-button.active {
+	color: black;  
+}
+
+.content {
+	display: none;  
+}
+
+.page-title {
+	margin-bottom: 10px;
+}
+
+.page-title h3 {
+	font-size: 28px;
+	color: #333333;
+	font-weight: 400;
+	text-align: center;
+}
+
+#board-search .search-window {
+	padding: 10px 0;
+}
+
+#board-search .search-window .search-wrap {
+	position: relative;
+	margin: 0 auto;
+	width: 50%; 
+	max-width: 300px; 
+}
+
+#board-search .search-window .search-wrap input {
+	height: 40px;  
+	width: calc(100% - 80px); 
+	font-size: 14px;
+	padding: 5px 10px;
+	border: 1px solid #ccc;
+	box-sizing: border-box; 
+}
+
+#board-search .search-window .search-wrap input:focus {
+	border-color: #AF7DE7;
+	outline: 0;
+	border-width: 1px;
+}
+
+#board-search .search-window .search-wrap .btn {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 80px;  
+	height: 40px;  
+	padding: 0;
+	font-size: 14px;
+	background-color: #AF7DE7;  
+	color: #fff;
+	border: none; 
+	cursor: pointer;
+}
+
+.board-table {
+	font-size: 13px;
+	width: 100%;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+.board-table a {
+	color: #333;
+	display: inline-block;
+	line-height: 1.4;
+	word-break: break-all;
+	vertical-align: middle;
+}
+
+.board-table a:hover {
+	text-decoration: underline;
+}
+
+.board-table th {
+	text-align: center;
+}
+
+.board-table .th-num {
+	width: 100px;
+	text-align: center;
+}
+
+.board-table .th-date {
+	width: 200px;
+}
+
+.board-table th, .board-table td {
+	padding: 14px 0;
+}
+
+.board-table tbody td {
+	border-top: 1px solid #e7e7e7;
+	text-align: center;
+}
+
+.board-table tbody th {
+	padding-left: 28px;
+	padding-right: 14px;
+	border-top: 1px solid #e7e7e7;
+	text-align: left;
+}
+
+.btn {
+	display: inline-block;
+	padding: 0 30px;
+	font-size: 15px;
+	font-weight: 400;
+	background: transparent;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 1px solid transparent;
+	text-transform: uppercase;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	-ms-transition: all 0.3s;
+	-o-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+.btn-dark {
+	background: #AF7DE7;
+	color: #fff;
+}
+
+.btn-dark:hover, .btn-dark:focus {
+	background: #373737;
+	border-color: #373737;
+	color: #fff;
+}
+
+.btn-dark {
+	background: #555;
+	color: #fff;
+}
+
+.btn-dark:hover, .btn-dark:focus {
+	background: #373737;
+	border-color: #373737;
+	color: #fff;
+}
+
+/* reset */
+* {
+	list-style: none;
+	text-decoration: none;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+.clearfix:after {
+	content: '';
+	display: block;
+	clear: both;
+}
+
+.container {
+	width: 1100px;
+	margin: 0 auto;
+}
+
+.blind {
+	position: absolute;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	margin: -1px;
+	width: 1px;
+	height: 1px;
+}
+
+/* Pagination styling */
+.pagination {
+	display: flex;
+	justify-content: center;  
+	padding: 20px 0;
+}
+
+.page-box {
+	width: 30px;  
+	height: 30px;
+	background-color: #AF7DE7;  
+	color: #fff;  
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 16px;
+	font-weight: bold;
+	border-radius: 4px;  
+}

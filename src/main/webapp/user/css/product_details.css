@@ -1,0 +1,213 @@
+body {
+	font-family: Arial, sans-serif;
+	/* margin: 0;
+	padding: 20px;
+	max-width: 1000px;
+	margin: 0 auto; */
+}
+
+.product-container {
+	margin: 0;
+	padding: 20px;
+	max-width: 1000px;
+	margin: 0 auto;
+	display: flex;
+	gap: 20px;
+	margin-bottom: 30px;
+}
+
+.product-image {
+    flex: 1;
+}
+
+.product-image img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd; /* 얇은 테두리 추가 */
+    border-radius: 4px; /* 필요에 따라 모서리를 둥글게 할 수 있음 */
+}
+
+
+.product-details {
+	flex: 1;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 25px;
+}
+
+.price-container {
+	text-align: right;
+	margin-bottom: 10px;
+}
+
+.price, .total-price { /* Updated CSS */
+	color: #BA0A23;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.free-exchange {
+    font-size: 0.7em;
+    color: #666;
+    text-align: right;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+select {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.total-container {
+	background-color: #f8f8f8;
+	padding: 15px;
+	margin-bottom: 15px;
+	border-radius: 4px;
+}
+
+.total-container p {
+	margin: 5px 0;
+	display: flex;
+	justify-content: space-between;
+}
+
+.buy-button {
+	background-color: #00c73c;
+	color: #fff;
+	padding: 15px;
+	text-align: center;
+	text-decoration: none;
+	display: block;
+	width: 100%;
+	border: none;
+	border-radius: 4px;
+	font-size: 1.1em;
+	cursor: pointer;
+}
+
+.tabs {
+	margin: 0;
+	padding: 20px;
+	max-width: 1000px;
+	margin: 0 auto;
+	display: flex;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 20px;
+}
+
+.tab {
+	flex: 1;
+	padding: 10px;
+	text-align: center;
+	cursor: pointer;
+	border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+	background-color: #3E3D4F;
+	border-bottom-color: #f8f8f8;
+	font-weight: bold;
+	color:white;
+}
+
+.tab-content {
+	display: none;
+}
+
+.tab-content.active {
+	margin: 0;
+	padding: 20px;
+	max-width: 1000px;
+	margin: 0 auto;
+	display: block;
+	background-color: #ffffff;
+	padding: 20px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+	background-color: #f8f8f8;
+}
+
+td {
+	padding: 12px 8px;
+	border: none;
+}
+
+td:first-child {
+	width: 30%;
+	color: #666;
+}
+
+.parent-container {
+    text-align: center; /* 부모 요소에 중앙 정렬을 적용 */
+}
+
+.expand-button {
+    width: 90%; /* 버튼의 너비를 90%로 줄여 여백을 줍니다 */
+    max-width: 600px; /* 최대 너비를 지정하여 너무 넓어지지 않게 설정 */
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #000;
+    text-align: center;
+    cursor: pointer;
+    margin: 20px auto; /* 상단과 하단 여백, 중앙 정렬을 위해 auto 사용 */
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.expanded-content {
+	display: none;
+}
+
+.expanded-content.active {
+    display: block;
+    text-align: center; /* 중앙 정렬 추가 */
+    padding-top: 50px;
+}
+
+.totals {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+	font-size: 0.8em; /* Reduced font size */
+}
+
+.total-amount {
+	flex: 1;
+	font-weight: bold; /* Made bold */
+}
+
+.total-quantity {
+	color: #666; /* Changed to gray */
+	font-size: 0.9em; /* Further reduced font size */
+	margin-right: 10px; /* Added some spacing */
+}
+
+.total-price {
+	text-align: right;
+}
+
+/* 기존 price 클래스 유지하면서 line-through 클래스 추가 */
+.price.line-through {
+	text-decoration: line-through;
+	color: #999;
+}
+
+/* 기존 discount-price 클래스는 그대로 유지 */
+.discount-price {
+	color: #BA0A23;
+	font-weight: bold;
+	font-size: 1.5em;
+}

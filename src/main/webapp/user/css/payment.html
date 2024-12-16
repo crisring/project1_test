@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주문/결제</title>
+</head>
+<script>
+	function toggleInputField() {
+		var selectElement = document.getElementById('delivery-request');
+		var customMemoInput = document.getElementById('custom-memo');
+
+		// "직접 입력하기" 옵션이 선택되면 입력 필드를 보이게 함
+		if (selectElement.value === 'custom') {
+			customMemoInput.style.display = 'block'; // 입력 필드를 보이게 함
+			customMemoInput.focus(); // 입력 필드에 포커스
+		} else {
+			customMemoInput.style.display = 'none'; // 입력 필드를 숨김
+			customMemoInput.value = ''; // 숨길 때 입력 값을 초기화
+		}
+	}
+
+	function toggleModal(modalId) {
+		const modal = document.getElementById(modalId);
+		modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+	}
+
+	// 금액 입력 후 반영하는 함수
+	function applyAmount() {
+		const amount = document.getElementById('charge-input').value;
+		if (amount) {
+			const paymentAmountSelect = document
+					.getElementById('payment-amount');
+			paymentAmountSelect.innerHTML = `<option>${parseInt(amount).toLocaleString()}원</option>`;
+		}
+		toggleModal('charge-modal'); // 모달 닫기
+	}
+
+	// 모달 외부 클릭 시 닫기
+	window.onclick = function(event) {
+		const modal = document.getElementById('charge-modal');
+		if (event.target === modal) {
+			modal.style.display = "none";
+		}
+	}
+</script>
+
+<style>
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+		'Helvetica', 'Arial', sans-serif;
+	background-color: #f2f2f2;
+	margin: 0;
+	padding: 0;
+	color: #333;
+}
+
+header {
+	background-color: white;
+	padding: 20px 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+	text-align: center;
+	font-size: 24px;
+	margin: 0;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 20px auto;
+	display: flex;
+	justify-content: space-between;
+}
+
+.main-content {
+	width: 65%;
+}
+
+h2 {
+	font-size: 18px;
+	margin-bottom: 15px;
+}
+
+.delivery-info, .order-summary, .payment-method, .privacy-agreement {
+	margin-bottom: 20px;
+	padding: 20px;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.info-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.change-btn {
+	background-color: white;
+	border: 1px solid #ddd;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.checkbox-label {
+	display: flex;
+	align-items: center;
+	font-size: 14px;
+	color: #666;
+}
+
+.checkbox-label input {
+	margin-right: 5px;
+}
+
+#delivery-request {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.product {
+	display: flex;
+	margin-bottom: 15px;
+}
+
+.product img {
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	margin-right: 15px;
+}
+
+.product-info h3 {
+	font-size: 16px;
+	margin: 0 0 5px;
+}
+
+.price {
+	margin: 5px 0;
+}
+
+.current-price {
+	font-weight: bold;
+}
+
+.original-price {
+	text-decoration: line-through;
+	color: #888;
+	margin-left: 5px;
+}
+
+.discount-label {
+	display: inline-block;
+	background-color: #e6f3e6;
+	color: #2e8b57;
+	padding: 2px 5px;
+	border-radius: 4px;
+	font-size: 12px;
+}
+
+.order-total, .payment-total {
+	display: flex;
+	justify-content: space-between;
+	font-weight: bold;
+	margin-top: 15px;
+	padding: 15px;
+	background-color: #e6f3e6;
+	border-radius: 4px;
+}
+
+.payment-option {
+	margin-bottom: 15px;
+}
+
+.naver-pay {
+	background-color: #2db400;
+	color: white;
+	padding: 2px 4px;
+	border-radius: 2px;
+	font-size: 12px;
+	margin-right: 5px;
+}
+
+.payment-amount {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border: 1px solid #ddd;
+	padding: 10px;
+	border-radius: 4px;
+}
+
+#payment-amount {
+	border: none;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.payment-terms {
+	color: #666;
+	font-size: 14px;
+	margin-top: 15px;
+	cursor: pointer;
+}
+
+.privacy-agreement {
+	font-size: 14px;
+	color: #666;
+}
+
+.privacy-agreement a {
+	color: #2db400;
+	text-decoration: none;
+}
+
+.payment-summary {
+	width: 30%;
+	background-color: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	align-self: flex-start;
+	position: sticky;
+	top: 20px;
+}
+
+.payment-row {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.pay-button {
+	width: 100%;
+	background-color: #00c73c;
+	color: white;
+	border: none;
+	padding: 15px;
+	font-size: 18px;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-top: 20px;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+	max-width: 500px;
+	border-radius: 8px;
+}
+
+.modal-content h3 {
+	margin-top: 0;
+}
+
+.modal-content ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+.modal-content li {
+	margin-bottom: 10px;
+}
+
+.memo-option, .charge-option {
+	width: 100%;
+	padding: 10px;
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.order-complete-header {
+	background-color: #00c73c;
+	color: white;
+	padding: 15px;
+	text-align: center;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	margin: -20px -20px 20px -20px;
+}
+
+.order-complete-message {
+	text-align: center;
+	color: #666;
+	margin-bottom: 20px;
+}
+
+.order-complete-details {
+	margin-top: 20px;
+}
+
+.order-complete-details h4 {
+	margin-bottom: 5px;
+}
+
+.order-complete hr {
+	border: none;
+	border-top: 1px solid #ddd;
+	margin: 20px 0;
+}
+
+@media ( max-width : 768px) {
+	.container {
+		flex-direction: column;
+	}
+	.main-content, .payment-summary {
+		width: 100%;
+	}
+	.payment-summary {
+		margin-top: 20px;
+		position: static;
+	}
+}
+
+.close {
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	font-size: 24px;
+	cursor: pointer;
+	color: black;
+}
+
+.close:hover {
+	color: red;
+}
+
+/* 배송 메모 입력 칸 스타일 */
+#custom-memo {
+	display: block;
+	width: 80%;
+	padding: 8px;
+	margin-top: 10px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	font-size: 14px;
+	color: #333;
+	background-color: #FFFFFF;
+	transition: border-color 0.3s ease;
+}
+
+#custom-memo:focus {
+	border-color: #f0f0f0;
+	outline: none;
+}
+/* placeholder 텍스트 스타일 */
+#custom-memo::placeholder {
+	color: #999;
+	font-style: italic;
+}
+
+.custom-modal {
+	display: none;
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-content {
+	background-color: white;
+	padding: 23px;
+	border-radius: 17px;
+	width: 300px;
+	text-align: center;
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.close-btn {
+	cursor: pointer;
+	font-size: 24px;
+}
+
+.amount-display {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 20px 0;
+}
+
+.input-wrapper {
+	margin-bottom: 10px;
+}
+
+input#charge-input {
+	padding: 10px;
+	font-size: 18px;
+	text-align: center;
+	border: none;
+	border-bottom: 2px solid black;
+	outline: none;
+}
+
+.confirm-btn {
+	width: 100%;
+	padding: 15px;
+	background-color: #27AE60;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-size: 18px;
+	cursor: pointer;
+	margin-top: 20px;
+}
+
+.confirm-btn:hover {
+	background-color: #219150;
+}
+</style>
+
+<body>
+	<header>
+		<h1>주문/결제</h1>
+	</header>
+	<div class="container">
+		<div class="main-content">
+			<section class="delivery-info">
+				<h2>배송지</h2>
+				<div class="info-row">
+					<span class="name">박ㅇㅇ (집)</span>
+					<button class="change-btn" id="changeButton" id="openModalBtn">변경</button>
+				</div>
+				<div class="info-row">
+					<span class="phone">010-1234 - 5678</span> <label
+						class="checkbox-label"> <input type="checkbox"
+						id="safe-number"> <span>안심번호 사용</span>
+					</label>
+				</div>
+				<div class="info-row">
+					<span class="address">서울 강남구 테헤란로 132</span>
+				</div>
+				<div class="delivery-memo">
+					<select id="delivery-request" onchange="toggleInputField()">
+						<option value="none" selected hidden>배송메모를 선택해주세요</option>
+						<!-- 기본으로 표시될 텍스트 -->
+						<option value="none">선택 안함</option>
+						<option value="contact">부재 시 연락 부탁드려요</option>
+						<option value="call">배송 전 미리 연락해 주세요</option>
+						<option value="custom">직접 입력하기</option>
+					</select> <input type="text" id="custom-memo" placeholder="배송메모를 입력해주세요"
+						style="display: none;">
+				</div>
+			</section>
+
+			<section class="order-summary">
+				<h2>주문상품</h2>
+				<div class="product">
+					<img src="/placeholder.svg" alt="나이키 V2K 런 블랙 앤트라사이트" width="80"
+						height="80">
+					<div class="product-info">
+						<h3>나이키 V2K 런 블랙 앤트라사이트 FD0736-001</h3>
+						<p class="price">
+							<span class="current-price">85,900원</span> <span
+								class="original-price">86,100원</span>
+						</p>
+						<span class="discount-label">즉시할인적용</span>
+					</div>
+				</div>
+				<div class="order-total">
+					<span>총 주문금액</span> <span class="total-price">85,900원</span>
+				</div>
+			</section>
+
+			<section class="payment-method">
+				<h2>결제수단</h2>
+				<div class="payment-option">
+					<label> <input type="radio" name="payment" checked>
+						<span class="naver-pay">N</span> pay 네이버 간편결제
+					</label>
+				</div>
+				<div class="payment-amount">
+					<span>충전</span> <select id="payment-amount"
+						onclick="toggleModal('charge-modal')">
+					</select>
+				</div>
+				<p class="payment-terms" onclick="toggleModal('terms-modal')">결제/할인혜택
+					안내 ></p>
+			</section>
+
+			<div id="charge-modal" class="custom-modal">
+				<div class="modal-content">
+					<div class="modal-header">
+						<span>금액 입력</span> <span class="close-btn"
+							onclick="toggleModal('charge-modal')">&times;</span>
+					</div>
+					<div class="input-wrapper">
+						<input type="number" id="charge-input" placeholder="금액을 입력하세요">
+					</div>
+					<p>1만원 단위 / 최대 2,000,000원 충전 가능</p>
+					<button class="confirm-btn" onclick="applyAmount()">확인</button>
+				</div>
+			</div>
+
+			<section class="privacy-agreement">
+				<p>
+					개인정보 제3자 동의: 에고엠포리움 <a href="#"
+						onclick="toggleModal('privacy-modal')"> 상세보기</a>
+				</p>
+			</section>
+		</div>
+
+		<aside class="payment-summary">
+			<h2>결제상세</h2>
+			<div class="payment-row">
+				<span>네이버페이 머니 사용</span> <span id="payment-amount-display">85,900원</span>
+			</div>
+			<div class="payment-total">
+				<span>총 결제금액</span> <span class="total-price">85,900원</span>
+			</div>
+			<button class="pay-button" onclick="processPayment()">85,900원
+				결제하기</button>
+		</aside>
+	</div>
+
+	<!-- Modals -->
+	<div id="address-modal" class="modal">
+		<div class="modal-content">
+			<div class="address-container">
+				<h1>배송지 목록</h1>
+				<button class="new-address-btn">+ 배송지 신규입력</button>
+				<ul class="address-list">
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div id="memo-modal" class="modal">
+		<div class="modal-content">
+			<h3>배송메모 선택</h3>
+			<ul>
+				<li><button class="memo-option">배송 전 연락 바랍니다</button></li>
+				<li><button class="memo-option">부재시 경비실에 맡겨주세요</button></li>
+				<li><button class="memo-option">부재시 집 앞에 놓아주세요</button></li>
+				<li><button class="memo-option">부재시 택배함에 넣어주세요</button></li>
+				<li><button class="memo-option">직접 입력</button></li>
+			</ul>
+			<div id="address-modal" class="modal">
+				<div class="modal-content">
+					<span class="close" onclick="toggleModal('address-modal')">&times;</span>
+					<!-- 나머지 모달 내용 -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="terms-modal" class="modal">
+		<div class="modal-content">
+			<h3>결제/할인혜택 안내</h3>
+			<!-- Add terms and conditions here -->
+			<button onclick="toggleModal('terms-modal')">닫기</button>
+		</div>
+	</div>
+
+	<div id="privacy-modal" class="modal">
+		<div class="modal-content">
+			<h3>개인정보 제3자 제공 동의</h3>
+			<!-- Add privacy policy details here -->
+			<button onclick="toggleModal('privacy-modal')">닫기</button>
+		</div>
+	</div>
+
+	<div id="order-complete-modal" class="modal">
+		<div class="modal-content order-complete">
+			<div class="order-complete-header">
+				<h3>주문 완료</h3>
+			</div>
+			<p class="order-complete-message">주문이 정상적으로 완료되었습니다</p>
+			<hr>
+			<div class="order-complete-details">
+				<h4>배송지 정보</h4>
+				<p id="delivery-address"></p>
+				<h4>결제 정보</h4>
+				<p id="payment-info"></p>
+			</div>
+			<button onclick="toggleModal('order-complete-modal')">닫기</button>
+		</div>
+	</div>
+</body>
+</html>
+
